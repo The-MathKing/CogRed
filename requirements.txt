@@ -1,0 +1,16 @@
+rdkit>=2023.9.1
+requests>=2.31
+pandas>=2.0
+numpy>=1.26
+biopython>=1.83
+pypdb>=2.3
+pubchempy>=1.0.4
+openmm>=8.1
+openff-toolkit>=0.15
+openmmforcefields>=0.12
+parmed>=4.2
+mdtraj>=1.9
+MDAnalysis>=2.7
+matplotlib>=3.8
+seaborn>=0.13
+scikit-learn>=1.4

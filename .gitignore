@@ -1,0 +1,15 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Large/derived data -- regenerate via scripts/, archive separately (Zenodo/OSF)
+data/receptors/
+data/md/
+data/docking/
+*.dcd
+*.chk
+*.pdbqt
+*.log
+
+!data/README.md
