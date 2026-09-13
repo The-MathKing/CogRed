@@ -1,18 +1,26 @@
 """
-ADMET / toxicity triage (manuscript Section 2.6).
+In silico developability and toxicity PREDICTION (manuscript Methods 2.6).
+
+Renamed from "ADMET triage" after external review: nothing here is measured.
+Every value this module produces is a prediction from a descriptor rule or a
+QSAR web tool, and the manuscript must report it as such. In particular, a
+predicted absence of toxicity is not evidence that a compound is non-toxic --
+it is evidence that a model did not flag it.
+
+Thresholds below are screening heuristics, not biological truth. The module
+therefore emits a continuous score (`rules_passed_of_4`) alongside the boolean
+gate so the manuscript can rank rather than merely filter.
 
 SwissADME and ProTox-II have no official batch REST API, so a fully
 reproducible open-science pipeline needs a documented, code-driven fallback:
 this script computes the same descriptor-based rules SwissADME reports
-(Lipinski, Ghose, Veber, Egan, Muegge) directly with RDKit, plus a PAINS/Brenk
-structural-alert screen, and produces a continuous multi-rule "druglikeness
-score" instead of a single pass/fail gate (critique doc Section 3, row
-"ADMET as pass/fail gate only").
+(Lipinski, Ghose, Veber, Egan) directly with RDKit, plus a PAINS/Brenk
+structural-alert screen.
 
 For the two endpoints RDKit cannot approximate on its own (hERG liability,
 hepatotoxicity), this script documents the manual step: submit
-`data/admet_ready_compounds.csv` to SwissADME (http://www.swissadme.ch) and
-ProTox-II (https://tox-new.charite.de/protox3/) and merge the downloaded
+`data/developability_passed_compounds.csv` to SwissADME (http://www.swissadme.ch)
+and ProTox-II (https://tox-new.charite.de/protox3/) and merge the downloaded
 results with `merge_external_admet_results`. Record the access date and tool
 version in the manuscript per the reproducibility checklist.
 """
@@ -79,8 +87,8 @@ def compute_admet_descriptors(smiles: str, catalog: FilterCatalog.FilterCatalog)
     }
 
 
-def run_admet_triage(input_csv: str = "data/derivative_library.csv",
-                      min_rules_passed: int = 3) -> pd.DataFrame:
+def run_developability_prediction(input_csv: str = "data/derivative_library.csv",
+                                   min_rules_passed: int = 3) -> pd.DataFrame:
     df_in = pd.read_csv(input_csv)
     params = FilterCatalog.FilterCatalogParams()
     params.AddCatalog(FilterCatalog.FilterCatalogParams.FilterCatalogs.PAINS)
@@ -89,13 +97,13 @@ def run_admet_triage(input_csv: str = "data/derivative_library.csv",
 
     rows = [compute_admet_descriptors(smi, catalog) for smi in df_in["smiles"]]
     df = pd.DataFrame(rows)
-    df["admet_triage_pass"] = (
+    df["predicted_developability_pass"] = (
         (df["rules_passed_of_4"] >= min_rules_passed) & (~df["structural_alert"])
     )
     return df
 
 
-def merge_external_admet_results(triage_df: pd.DataFrame, swissadme_csv: str | None = None,
+def merge_external_admet_results(predictions_df: pd.DataFrame, swissadme_csv: str | None = None,
                                   protox_csv: str | None = None) -> pd.DataFrame:
     """Merge manually downloaded SwissADME / ProTox-II results by SMILES.
 
@@ -103,7 +111,7 @@ def merge_external_admet_results(triage_df: pd.DataFrame, swissadme_csv: str | N
       swissadme_csv: smiles, gi_absorption, bbb_permeant, cyp_inhibitor_flags, ...
       protox_csv:    smiles, predicted_ld50_mg_kg, tox_class, hepatotoxicity_prob, ...
     """
-    merged = triage_df
+    merged = predictions_df
     if swissadme_csv:
         merged = merged.merge(pd.read_csv(swissadme_csv), on="smiles", how="left")
     if protox_csv:
@@ -112,11 +120,11 @@ def merge_external_admet_results(triage_df: pd.DataFrame, swissadme_csv: str | N
 
 
 if __name__ == "__main__":
-    triage = run_admet_triage()
-    triage.to_csv("data/admet_triage_results.csv", index=False)
-    passed = triage[triage["admet_triage_pass"]]
-    passed[["smiles"]].to_csv("data/admet_ready_compounds.csv", index=False)
-    print(f"{len(passed)}/{len(triage)} compounds passed the descriptor-based "
-          f"ADMET triage. Submit data/admet_ready_compounds.csv to SwissADME "
+    predictions = run_developability_prediction()
+    predictions.to_csv("data/developability_predictions.csv", index=False)
+    passed = predictions[predictions["predicted_developability_pass"]]
+    passed[["smiles"]].to_csv("data/developability_passed_compounds.csv", index=False)
+    print(f"{len(passed)}/{len(predictions)} compounds passed the descriptor-based "
+          f"developability prediction. Submit data/developability_passed_compounds.csv to SwissADME "
           f"and ProTox-II for the two endpoints not covered here (hERG, "
           f"hepatotoxicity), then run merge_external_admet_results().")

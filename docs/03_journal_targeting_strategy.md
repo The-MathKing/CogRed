@@ -1,82 +1,103 @@
-# Journal Targeting Strategy
+# Journal Targeting Strategy (Revision 2)
 
-All five are peer-reviewed and either fully open-access or open-access-optioned,
-and all regularly publish pure-computational CADD studies (no wet-lab data
-required). Ranked roughly by fit for this specific paper.
+Reordered after external review. The previous version named JCIM as the primary
+target; **that was wrong** and is corrected below. The correction follows from
+a verified scope statement, not from a change of ambition.
 
-## 1. Journal of Chemical Information and Modeling (JCIM, ACS) — primary target
-- **Audience:** Computational/medicinal chemists, cheminformaticians; the
-  disciplinary home for docking/MD/ADMET methods papers.
-- **OA status:** Hybrid — OA optional via ACS AuthorChoice (fee applies); free
-  to publish subscription route if OA isn't required.
-- **Formatting:** ACS format, ~6000-8000 words + SI; strict on methods
-  reproducibility (they will desk-reject or require revision if version
-  numbers, seeds, and grid box parameters are missing).
-- **Benchmarks this paper must hit:** enrichment/validation of the docking
-  pipeline on known actives vs. decoys (Section 2.5/3.2 above) is close to
-  mandatory here; MM-PBSA/MM-GBSA with proper error bars; full SI compound
-  table. This is the most technically demanding reviewer pool of the five —
-  strongest fit if the MD+selectivity additions are actually completed.
+## Verified constraints (checked against journal sources, September 2026)
 
-## 2. PLOS Computational Biology — strong secondary target
-- **Audience:** Broad computational biology, mechanistic/systems framing valued
-  over pure method novelty; reviewers weigh biological significance heavily.
-- **OA status:** Fully open access (APC ~$3000, fee waivers available).
-- **Formatting:** No strict word limit; structured abstract optional; strong
-  preference for a clear "Author Summary" (plain-language paragraph) — this
-  suits the disease-relevance narrative (fragile sites, genomic instability)
-  well if framed carefully per the Tier 1/Tier 2 distinction in the critique.
-- **Benchmarks:** the genomic feature analysis (§2.10/3.7) and the mechanistic
-  narrative matter more here than at JCIM; still expect rigorous methods
-  reporting and code availability (they require a public repository — this
-  one qualifies).
+- **Scientific Reports:** title ≤20 words; abstract ≤200 words; main text
+  ≤4,500 words excluding Abstract, Methods, References, figure legends.
+- **JCIM scope:** explicitly does **not** consider straightforward applications
+  of molecular docking to a single target system without adequate experimental
+  validation.
+- **JCIM MD reporting guidelines** (*JCIM* 2023, DOI 10.1021/acs.jcim.3c00599):
+  ≥3 replica simulations, ideally from different coordinates/velocities, RNG
+  seeds disclosed, statistical variance discussed. **Adopted for this project
+  regardless of target journal** — it is simply correct practice.
 
-## 3. Scientific Reports (Nature Portfolio)
-- **Audience:** Broad, multidisciplinary; higher volume/faster turnaround than
-  the above two; good fallback or simultaneous-tier option.
-- **OA status:** Fully open access (APC ~$2390, waiver program).
-- **Formatting:** Flexible IMRaD, generally more lenient on scope/length;
-  editorial bar for "significance" is lower than PLOS Comp Biol, but technical
-  soundness review is still real (statistics, reproducibility).
-- **Benchmarks:** Full pipeline is not strictly required to pass review, but
-  omitting MD/selectivity entirely would likely draw a "computational
-  validation is limited to docking" reviewer comment — same core additions
-  still recommended.
+---
 
-## 4. Frontiers in Pharmacology (Experimental Pharmacology and Drug Discovery
-   section)
-- **Audience:** Pharmacology-focused, receptive to target-mechanism-centered
-  CADD papers, including kinase modulator discovery.
-- **OA status:** Fully open access (APC ~$2950).
-- **Formatting:** Structured, section-based Frontiers template; interactive
-  review process (reviewers and authors correspond directly), which can be an
-  advantage for a methodologically ambitious but first-time-in-this-subfield
-  submission.
-- **Benchmarks:** Selectivity profiling against kinase off-targets is
-  particularly well-received in this venue given its pharmacology audience;
-  make sure the "modulator vs. inhibitor" pharmacological rationale (critique
-  §2) is stated clearly since this audience will scrutinize mechanism claims.
+## 1. Scientific Reports — most realistic target for the current study
+- **Audience:** Broad multidisciplinary; covers computational biology, drug
+  discovery, and molecular modeling.
+- **OA status:** Fully open access; waiver program available.
+- **Why it fits:** the study is technically sound computational work with
+  honestly scoped claims. Scientific Reports evaluates technical soundness
+  rather than demanding novelty or experimental validation, which matches what
+  this project can support today.
+- **Must hit:** the hard format limits above (the previous 250-word abstract
+  and long title both violated them); code availability; honest scoping of
+  every predicted quantity; the scaffold-split benchmark with baselines.
+- **Risk:** low, provided the modulator language is gone.
 
-## 5. ACS Omega
-- **Audience:** Broad chemistry, higher acceptance of preliminary/exploratory
-  computational work; good option if compute constraints limit the study to
-  docking + ADMET + a smaller MD subset.
-- **OA status:** Fully open access (APC ~$2500, lower than most ACS journals).
-- **Formatting:** ACS format, shorter/faster review cycle than JCIM; less
-  demanding on enrichment/validation benchmarks.
-- **Benchmarks:** This is the realistic fallback if MD/MM-PBSA and kinome
-  selectivity can't be completed at full scale before submission — but the
-  paper should still be explicit about that scope limitation in Discussion
-  rather than silently omitting the analyses.
+## 2. PLOS Computational Biology — possible, but only with a unified biological story
+- **Audience:** Computational biologists; weighs biological insight and
+  significance heavily, not just technical execution.
+- **OA status:** Fully open access; fee waivers available.
+- **Why it might fit:** if the paper delivers a genuine biological insight
+  rather than a candidate list. The journal also expects computational
+  discovery to be validated or enriched by experiment or real-world data
+  *where possible*.
+- **Blocker:** as outlined, the ligand-prioritization work and the CFS biology
+  are structurally separate (see `04_review_response.md` §A — we judge that
+  separation to be honest rather than fixable by reorganization). Without a
+  single integrated biological argument, this is a moderate-to-low fit.
+- **Would become a strong fit if:** even minimal functional data (a biochemical
+  ATR/CHK1 kinase assay on 2-3 top candidates) were added, which would also
+  restore the mechanistic claim the review correctly stripped out.
+
+## 3. Frontiers in Pharmacology — viable, with the selectivity work as the draw
+- **Audience:** Pharmacology-focused; receptive to target-mechanism-centered
+  computational work.
+- **OA status:** Fully open access.
+- **Why it fits:** the predicted cross-kinase selectivity analysis — especially
+  benchmarked against reference compounds with published kinome profiles — is
+  well matched to this readership.
+- **Must hit:** this audience will scrutinize mechanism claims hardest, so the
+  Introduction §1.4 scope paragraph (ATP-pocket occupancy ≠ functional
+  direction) is load-bearing here. Interactive review can help a
+  methodologically careful but mechanistically modest paper.
+
+## 4. ACS Omega — honest fallback
+- **Audience:** Broad chemistry; accepts exploratory computational work.
+- **OA status:** Fully open access.
+- **Why it fits:** if MD/MM-PBSA must be scoped down to a small shortlist for
+  compute reasons, this venue accommodates that — provided the limitation is
+  stated rather than concealed.
+
+## 5. JCIM — **not a current target**; re-enters scope only under specific conditions
+- **Why it was demoted:** its scope statement excludes straightforward docking
+  applications to a single target without experimental validation. A pipeline
+  assembled from Vina + RDKit + SwissADME + OpenMM + MM-PBSA is not, by itself,
+  a new methodology. The previous ranking of JCIM as primary target reflected
+  ambition rather than the journal's stated criteria.
+- **Re-enters scope if either:**
+  - **(a) Experimental validation** is obtained for top candidates (even a
+    single biochemical kinase assay), **or**
+  - **(b) Demonstrated methodological contribution** — the leakage-controlled
+    scaffold-split benchmarking protocol and the within-receptor score
+    normalization for cross-kinase selectivity, shown quantitatively to change
+    conclusions relative to conventional practice. Note this is a real
+    empirical question: if the benchmark shows the multi-stage pipeline does
+    *not* outperform baseline docking (a likely outcome), that is a publishable
+    negative result but not a methodological novelty claim, and the paper
+    should go to Scientific Reports instead.
+
+---
 
 ## Recommended sequencing
-1. Build the full pipeline (docking + ADMET + MD/MM-PBSA + selectivity +
-   genomic feature analysis) targeting **JCIM** as the primary submission.
-2. If compute/time constraints force cutting MD/MM-PBSA down to a small
-   shortlist only, retarget to **PLOS Computational Biology** or **Frontiers
-   in Pharmacology**, which weigh mechanistic/biological narrative alongside
-   (not solely) computational exhaustiveness.
-3. Keep **Scientific Reports** and **ACS Omega** as fallback venues if the
-   primary submission is rejected on scope grounds rather than technical
-   grounds — both have faster cycles and would not require re-scoping the
-   science.
+
+1. **Draft to Scientific Reports constraints** (20-word title, 200-word
+   abstract, 4,500-word main text) as the default target. These limits are the
+   tightest of the five, so drafting to them keeps every other venue reachable
+   without restructuring.
+2. **Run the benchmark before choosing the final venue.** The comparison in
+   Results §3.2 determines what kind of paper this is. Strong, honest
+   outperformance → consider JCIM route (b) or Frontiers. Null or negative →
+   Scientific Reports, with the benchmark as the headline contribution.
+3. **Pursue a wet-lab collaborator in parallel with drafting, not after.** One
+   biochemical kinase assay on the top candidates is the single highest-value
+   addition available to this project: it unlocks JCIM route (a), materially
+   strengthens PLOS Computational Biology, and restores the functional claim
+   that the review correctly required us to drop.

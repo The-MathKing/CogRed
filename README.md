@@ -1,39 +1,58 @@
-# In Silico Optimization of ATR/CHK1 Modulators for Fragile-Site Stability
+# Candidate ATR/CHK1 Ligand Prioritization for Replication-Stress Research
 
-Open-science computational pipeline supporting the manuscript *"Structure-
-Based Optimization and Selectivity Profiling of ATR/CHK1 Pathway Modulators
-to Suppress Replication Stress at Common Fragile Sites."*
+Open-science computational pipeline supporting the manuscript *"Leakage-
+Controlled Benchmarking and Structure-Based Prioritization of Candidate ATR
+and CHK1 Ligands for Replication-Stress Research."*
+
+> **Evidentiary boundary — read before using or citing anything here.**
+> This pipeline supports claims about **predicted** binding, relative ranking,
+> retrieval performance under scaffold-split evaluation, conformational
+> stability, estimated relative energetics, predicted selectivity, and
+> predicted developability. It **cannot** establish whether a ligand activates,
+> inhibits, or partially modulates ATR/CHK1, nor any statement about pathway
+> output, fork stability, or cellular or genomic phenotype. ATR activation is
+> protein-mediated (ATRIP/TOPBP1/ETAA1) and is not determined by ATP-pocket
+> occupancy. Outputs are **candidates and hypotheses for experimental
+> testing**, not demonstrated modulators.
 
 Start here:
 
-- **[`docs/01_critique_and_rigor_elevation.md`](docs/01_critique_and_rigor_elevation.md)**
-  — PI-level critique of the project's scientific framing, the specific gaps
-  that would draw reviewer pushback (especially the Cri du Chat mechanistic
-  claim and the inhibitor-vs-modulator pharmacology question), and the
-  additions that elevate this from a screening exercise to a publishable
-  study. **Read this first** — it explains the design choices in every script
-  below.
+- **[`docs/04_review_response.md`](docs/04_review_response.md)** — response to
+  external review (Round 1): what was accepted, what was contested, and every
+  change it forced. **Read this first** — it explains why the project's central
+  claim was lowered and why several scripts were rewritten.
 - **[`docs/02_manuscript_outline.md`](docs/02_manuscript_outline.md)** —
-  granular IMRaD outline, section-by-section, mapped to the scripts that
-  produce each result.
+  current IMRaD outline (Revision 2), restructured so the pipeline must earn
+  trust via benchmarking before its candidates are presented.
 - **[`docs/03_journal_targeting_strategy.md`](docs/03_journal_targeting_strategy.md)**
-  — five target journals (JCIM, PLOS Comp Biol, Scientific Reports, Frontiers
-  in Pharmacology, ACS Omega) with audience, formatting, and the specific
-  technical benchmarks each expects.
+  — journal strategy (Revision 2). Scientific Reports is now the primary
+  target; JCIM was demoted for a verified scope reason.
+- **[`docs/01_critique_and_rigor_elevation.md`](docs/01_critique_and_rigor_elevation.md)**
+  — original rigor audit. Sections 2 and 4 are **superseded**; retained for the
+  revision record.
 
 ## Pipeline (`scripts/`, run in order)
 
-| # | Script | Manuscript section | What it does |
+| # | Script | Methods § | What it does |
 |---|---|---|---|
-| 01 | `01_fragile_site_mapping.py` | 2.10 / 3.7 | Genomic coordinates + AT-content/flexibility features for FRA3B/FRA16D/FRA7H |
-| 02 | `02_seed_compound_library.py` | 2.2 | Reproducible SMILES pull for known ATR/CHK1 modulators (PubChem) + broader ChEMBL actives |
-| 03 | `03_derivative_generation.py` | 2.3 | BRICS-based derivative generation + Lipinski/Veber/PAINS/Brenk pre-filter |
-| 04 | `04_admet_filtering.py` | 2.6 | Descriptor-based ADMET triage (SwissADME-equivalent rules) + hooks for merging SwissADME/ProTox-II exports |
-| 05 | `05_docking_pipeline.py` | 2.4 | AutoDock Vina batch docking wrapper (ligand/receptor prep via Open Babel, triplicate seeded runs) |
-| 06 | `06_md_simulation_setup.py` | 2.7 | OpenMM MD (OpenFF ligand parametrization) for shortlisted hits |
-| 07 | `07_mmpbsa_binding_energy.py` | 2.8 | MM-GBSA/MM-PBSA via ParmEd → MMPBSA.py on MD trajectories |
-| 08 | `08_kinase_selectivity_profiling.py` | 2.9 | Off-target kinome panel docking + selectivity scoring |
-| 09 | `09_pipeline_validation.py` | 2.5 / 3.2 | Actives/decoys enrichment (ROC-AUC, EF1%/EF5%) to validate the docking protocol itself |
+| 01 | `01_fragile_site_mapping.py` | SI | CFS genomic features (FRA3B/FRA16D/FRA7H). Supporting Information — defines the terminal experimental prediction, does **not** drive compound selection |
+| 02 | `02_seed_compound_library.py` | 2.2 | Reproducible SMILES retrieval (PubChem/ChEMBL); provenance recorded for the leakage audit |
+| 03 | `03_derivative_generation.py` | 2.3 | BRICS derivative generation + property pre-filters. Standard cheminformatics, **not claimed as novelty** |
+| 04 | `04_developability_prediction.py` | 2.6 | In silico developability/toxicity **prediction** (renamed from "ADMET triage" — nothing here is measured) |
+| 05 | `05_docking_pipeline.py` | 2.4 | Vina batch docking; ≥3 seeded runs per ligand, seeds and versions logged |
+| 06 | `06_md_simulation_setup.py` | 2.7 | OpenMM MD (OpenFF ligand parametrization) |
+| 07 | `07_mmpbsa_binding_energy.py` | 2.8 | MM-PBSA **relative energetic estimation** + trajectory-window sensitivity. Never reported as ΔG |
+| 08 | `08_kinase_selectivity_profiling.py` | 2.9 | **Predicted** cross-kinase selectivity, z-normalized *within each receptor* (raw scores are not comparable across proteins), benchmarked against reference compounds with published kinome profiles |
+| 09 | `09_pipeline_validation.py` | 2.5 | Scaffold-split retrieval, seed↔evaluation leakage audit, baseline-vs-pipeline comparison with bootstrap CIs |
+| 10 | `10_integrated_ranking.py` | 2.10 | Pre-specified desirability weights **plus** Dirichlet Monte-Carlo weight-sensitivity analysis and objective-correlation reporting |
+
+### Pre-specified analysis plan
+
+Splits, metrics, and desirability weights are fixed in code (`09_*`, `10_*`)
+before results are seen. **If the benchmark shows the multi-stage pipeline does
+not outperform baseline docking, that is the reported result** — see
+`docs/04_review_response.md` §B. Both scripts print an explicit notice when
+their outputs fail to support the more favorable interpretation.
 
 ## Setup
 
@@ -42,14 +61,15 @@ python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-External CLI tools (not pip-installable, install separately): Open Babel
-(`obabel`), AutoDock Vina (`vina`), AmberTools (`MMPBSA.py`, for script 07
-only — used purely as an MM-PBSA post-processing tool, the MD engine
-throughout is OpenMM).
+External CLI tools (not pip-installable): Open Babel (`obabel`), AutoDock Vina
+(`vina`), AmberTools (`MMPBSA.py`, script 07 only — post-processing only; the
+MD engine throughout is OpenMM).
 
-## Status / open parameters
+## Open items
 
-See `docs/01_critique_and_rigor_elevation.md` §6 for the assumptions currently
-baked into the scripts (seed compound strategy, OpenMM/MMPBSA.py choice,
-compute-budget scoping for MD) — flag if any should change before running the
-pipeline for real.
+- **Highest-value next step:** a wet-lab collaborator for a biochemical
+  ATR/CHK1 kinase assay on the top candidates. It is the only thing that
+  restores a functional-pharmacology claim and reopens JCIM/PLOS Comp Biol.
+- Assumptions currently baked into the scripts (seed strategy, OpenMM +
+  MMPBSA.py choice, MD compute scoping) are listed in
+  `docs/01_critique_and_rigor_elevation.md` §6.

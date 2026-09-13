@@ -1,6 +1,18 @@
 """
-MM-PBSA binding free energy estimation on top of the OpenMM MD trajectories
-produced by `06_md_simulation_setup.py` (manuscript Section 2.8).
+MM-PBSA RELATIVE ENERGETIC ESTIMATION on top of the OpenMM MD trajectories
+produced by `06_md_simulation_setup.py` (manuscript Methods 2.8).
+
+Terminology, per external review: the values produced here are end-state
+MM-GBSA/MM-PBSA estimates used for RELATIVE RANKING of ligand-associated
+energetics. They are not binding free energies and must never be reported as
+ΔG, as affinities, or in a figure axis labelled ΔG. A value of, say,
+-48 kcal/mol is not an experimentally meaningful affinity; it is a
+model-dependent number whose usefulness is confined to ordering compounds
+computed under identical settings.
+
+Report alongside every value: frames used, frame correlation, dielectric
+assumptions, entropy treatment, error estimation, and sensitivity to the
+chosen trajectory window (`assess_window_sensitivity` below).
 
 OpenMM has no native MM-PBSA implementation, and AmberTools' `MMPBSA.py`
 remains the most widely cited, reviewer-recognized implementation, so this
@@ -67,13 +79,45 @@ def run_mmpbsa(prmtop_complex: Path, prmtop_receptor: Path, prmtop_ligand: Path,
     return out_dat
 
 
+def assess_window_sensitivity(cdir: Path, windows: tuple[tuple[int, int], ...] =
+                               ((1, 3333), (3334, 6666), (6667, 9999))) -> pd.DataFrame:
+    """Recompute the estimate over disjoint trajectory windows.
+
+    If the estimate swings substantially between windows, the trajectory is not
+    converged for this purpose and the ranking derived from it is unreliable --
+    report the spread rather than the single whole-trajectory number.
+    """
+    rows = []
+    for start, end in windows:
+        mmpbsa_in = cdir / f"mmpbsa_{start}_{end}.in"
+        mmpbsa_in.write_text(
+            f"Window {start}-{end}\n&general\n  startframe={start}, endframe={end}, "
+            f"interval=1, verbose=2,\n/\n&gb\n  igb=5, saltcon=0.15,\n/\n")
+        results_dat = run_mmpbsa(
+            prmtop_complex=cdir / "complex.prmtop",
+            prmtop_receptor=cdir / "receptor.prmtop",
+            prmtop_ligand=cdir / "ligand.prmtop",
+            trajectory_dcd=cdir / "production.dcd",
+            mmpbsa_in=mmpbsa_in, out_dir=cdir,
+        )
+        parsed = parse_mmpbsa_results(results_dat)
+        parsed.update({"window_start": start, "window_end": end, "compound": cdir.name})
+        rows.append(parsed)
+    return pd.DataFrame(rows)
+
+
 def parse_mmpbsa_results(results_dat: Path) -> dict:
-    """Extract DELTA TOTAL binding free energy (mean +/- std) from MMPBSA.py output."""
+    """Extract the DELTA TOTAL estimate (mean +/- std) from MMPBSA.py output.
+
+    Returned as `mmpbsa_estimated_energy_kcal_mol` -- deliberately not named
+    delta_g, so the column name itself resists being mislabelled downstream.
+    """
     text = results_dat.read_text()
     for line in text.splitlines():
         if line.strip().startswith("DELTA TOTAL"):
             parts = line.split()
-            return {"delta_g_kcal_mol": float(parts[2]), "std_kcal_mol": float(parts[3])}
+            return {"mmpbsa_estimated_energy_kcal_mol": float(parts[2]),
+                    "std_kcal_mol": float(parts[3])}
     raise ValueError(f"Could not find DELTA TOTAL line in {results_dat}")
 
 
@@ -105,4 +149,4 @@ if __name__ == "__main__":
     shortlist_dirs = sorted(Path("data/md").glob("*"))
     df = batch_mmpbsa(shortlist_dirs)
     df.to_csv("data/mmpbsa_results.csv", index=False)
-    print(df.sort_values("delta_g_kcal_mol"))
+    print(df.sort_values("mmpbsa_estimated_energy_kcal_mol"))

@@ -5,6 +5,21 @@
 This document is the standing rigor audit for the project. Treat it as a living
 checklist — update it as analyses are added or claims are re-scoped.
 
+> **Superseded in part (Revision 2).** An external review established that the
+> project's central claim exceeded what the methods can support. Sections 2 and
+> 4 below are retained as the *historical* reasoning but their conclusions are
+> superseded: the paper no longer claims to discover "modulators," and the
+> mid-affinity-window idea is demoted to an untested hypothesis. See
+> `04_review_response.md` for the full response and
+> `02_manuscript_outline.md` for the current position. Sections 1, 3, 5, and 6
+> remain in force.
+>
+> **The boundary that now governs every claim:** docking, MD, and MM-PBSA
+> support statements about predicted binding, ranking, retrieval performance,
+> pose stability, estimated relative energetics, predicted selectivity, and
+> predicted developability. They cannot establish activation, inhibition,
+> partial modulation, pathway output, or any cellular phenotype.
+
 ---
 
 ## 1. The single biggest weakness: the mechanistic bridge to Cri du Chat
@@ -49,7 +64,17 @@ this, for a specific reason:
    overclaiming the Cri du Chat link, and reviewers will respect the
    precision.
 
-## 2. The therapeutic-window problem you must address explicitly
+## 2. The therapeutic-window problem *(superseded — see `04_review_response.md`)*
+
+> **Revision 2 note:** the analysis below correctly identified that existing
+> ATR/CHK1 chemical matter is inhibitory while the project's goal was
+> stabilizing. It drew the wrong conclusion — that the fix was a
+> "Pharmacological Rationale" subsection plus an affinity-window proxy. The
+> correct fix is that **no in silico method here can establish functional
+> direction at all**, because ATR activation is protein-mediated
+> (ATRIP/TOPBP1/ETAA1) rather than determined by ATP-pocket occupancy. The
+> claim was lowered to ligand prioritization instead of being argued for.
+
 
 ATR/CHK1 inhibitors (berzosertib, ceralasertib, prexasertib, SRA737) are
 oncology drugs — they work by *removing* the checkpoint in cancer cells that
@@ -95,9 +120,18 @@ rather than "most negative ΔG wins").
 | No negative/decoy controls | **DUD-E-style or actives/decoys enrichment test** on ATR/CHK1 using known actives from ChEMBL vs. property-matched decoys | Lets you report an actual performance metric (AUC, EF1%) for the virtual screening pipeline itself — reviewers will ask "how do you know your pipeline works?" |
 | Statistical rigor | Report **triplicate docking with different seeds**, MD block-averaging with error bars, and explicit reproducibility info (software versions, exact PDB IDs + resolution, grid box coordinates) | Required for JCIM-tier reproducibility standards |
 
-## 4. Balancing activation vs. toxic hyperactivation (the mechanism refinement)
+## 4. Balancing activation vs. hyperactivation *(superseded — see `04_review_response.md` §C)*
 
-Frame this quantitatively rather than qualitatively:
+> **Revision 2 note:** items 1 and 2 below proposed using binned MM-PBSA
+> affinity as an in silico proxy for signaling amplitude. That does not follow
+> — binding affinity is not equivalent to kinase activation, pathway output,
+> fork stability, or cellular phenotype. What survives is only this: the
+> candidate set spans a range of *predicted target engagement*, which makes it
+> a useful input for a future functional experiment testing whether pathway
+> output varies non-monotonically with engagement. Item 3 (the limitation)
+> was right and is retained and strengthened.
+
+Original text, retained for the revision record:
 
 1. Use literature-derived phospho-CHK1(Ser345)/phospho-ATR(Thr1989) dose-response
    curves as a conceptual reference for "physiological" vs. "hyperactivation"

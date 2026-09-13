@@ -1,151 +1,223 @@
-# Manuscript Outline
+# Manuscript Outline (Revision 2)
 
-Target format: standard IMRaD, sized for JCIM / PLOS Computational Biology /
-Scientific Reports (see `03_journal_targeting_strategy.md` for per-journal
-adjustments). Section numbers map to files/functions in `scripts/` where
-applicable so results are traceable to code.
+Revised after external review — see `04_review_response.md` for what changed
+and why. The central claim is now **candidate ligand prioritization**, not
+functional modulation.
 
-## Title (working)
-*"Structure-Based Optimization and Selectivity Profiling of ATR/CHK1
-Pathway Modulators to Suppress Replication Stress at Common Fragile Sites:
-An Open-Source Computational Pipeline"*
+**The evidentiary boundary, stated once and enforced everywhere below:**
+this study can support claims about predicted binding, relative ranking,
+retrieval performance under scaffold-split evaluation, conformational
+stability, estimated relative energetics, predicted selectivity, and predicted
+developability. It cannot support claims about kinase activation, inhibition,
+partial modulation, pathway output, fork stability, or any cellular or
+genomic phenotype. Every sentence in the manuscript must fall on the
+supportable side of that line or be explicitly marked as hypothesis.
 
-(Note: title drops the direct "Cri du Chat" claim per the rigor critique —
-keep the disease-relevance framing for the Introduction/Discussion, scoped as
-in §1 of the critique doc.)
+Format sized for Scientific Reports (primary target): **title ≤20 words,
+abstract ≤200 words, main text ≤4,500 words** excluding Abstract, Methods,
+References, and figure legends. See `03_journal_targeting_strategy.md` for
+per-journal adjustments.
 
-## Abstract (250 words)
-- 1 sentence: replication stress at common fragile sites (CFS) as a driver of
-  genomic instability; ATR-CHK1 as the checkpoint axis.
-- 1-2 sentences: gap — most existing ATR/CHK1 chemical matter is inhibitory
-  (oncology-oriented); need for modulators that stabilize rather than abolish
-  checkpoint signaling.
-- 2-3 sentences: pipeline summary (ChEMBL seed set → derivative generation →
-  ensemble docking → consensus scoring → ADMET/tox triage → MD/MM-PBSA on
-  shortlist → kinome selectivity panel).
-- 1-2 sentences: headline quantitative results (placeholder until data exists).
-- 1 sentence: significance / open-science contribution (fully reproducible,
-  code released).
+## Title (working, 14 words)
+*"Leakage-Controlled Benchmarking and Structure-Based Prioritization of
+Candidate ATR and CHK1 Ligands for Replication-Stress Research"*
+
+Alternatives if the benchmark returns a negative result (likely — see
+`04_review_response.md` §B), in which case the benchmark becomes the headline:
+*"Scaffold-Split Benchmarking Limits the Apparent Advantage of Multi-Stage
+Virtual Screening for ATR and CHK1"*
+
+Note what the title no longer claims: no "modulator", no "suppress replication
+stress", no disease name. Fragile-site biology is context in the Introduction
+and the source of the terminal experimental prediction, not a result.
+
+## Abstract (≤200 words for Scientific Reports)
+Sequence: problem → gap → approach → quantitative result → scoped significance.
+Every predicted quantity must carry the word *predicted* or *estimated*.
+
+- Problem (1 sentence): replication stress at common fragile sites; ATR-CHK1
+  as the checkpoint axis maintaining replication integrity.
+- Gap (1 sentence): existing chemical matter is overwhelmingly inhibitory and
+  oncology-directed; candidate ligands have not been systematically
+  prioritized under leakage-controlled evaluation.
+- Approach (2-3 sentences): ChEMBL/PubChem seed set → derivative generation →
+  scaffold-split benchmarking against baseline docking → consensus scoring →
+  predicted developability → MD/MM-PBSA on shortlist → predicted cross-kinase
+  selectivity.
+- Result (2 sentences): benchmark numbers (ROC-AUC, PR-AUC, EF1% vs. baseline,
+  with CIs) **and** the candidate set. Report the benchmark result whichever
+  direction it goes.
+- Significance (1 sentence): candidates and the open, reusable evaluation
+  protocol are offered as **testable hypotheses for functional evaluation** —
+  not as demonstrated modulators.
 
 ## 1. Introduction
-1.1 Replication stress and common fragile sites — biology of FRA3B/FHIT,
-    FRA16D/WWOX, FRA7H; late replication timing, paucity of origins, AT-rich
-    flexibility/secondary-structure motifs (cite Glover, Durkin, Casper,
-    Debatisse & Rosselli reviews).
-1.2 ATR-CHK1 axis — fork stabilization, origin firing suppression, S/G2-M
-    checkpoint; distinguish physiological activation from chronic
-    hyperactivation/senescence.
-1.3 Disease relevance, precisely scoped — Tier 1 (CFS expression, cancer
-    genomic instability, well-cited) and Tier 2 (hypothesis: fork-stability
-    modulation as a contributor to non-recurrent germline microdeletion
-    formation via FoSTeS/MMBIR, explicitly flagged as motivating future
-    experimental work, Cri du Chat used as one illustrative example of this
-    disease class).
-1.4 Rationale for a modulator (not inhibitor) chemical strategy — the
-    therapeutic-window argument from the critique doc.
-1.5 Study objectives and pipeline overview (one summary figure).
+1.1 **Replication stress and common fragile sites.** Distinguish *established
+    determinants* of fragility — late/delayed replication timing, origin
+    paucity, transcription-replication conflict, large-gene architecture —
+    from *candidate sequence-level contributors* (AT-rich flexibility peaks,
+    non-B DNA structure). Do not present the latter as universal defining
+    properties; CFS fragility is now understood as emergent from multiple
+    interacting features.
+1.2 **The ATR-CHK1 axis.** Fork stabilization, origin firing suppression,
+    S/G2-M checkpoint. Draw a hard distinction between (a) physiological ATR
+    activation, which proceeds through ATRIP/TOPBP1/ETAA1 protein-mediated
+    mechanisms, and (b) pharmacological inhibition of kinase activity by
+    ATP-competitive ligands. Do **not** imply a single continuum
+    (inhibition ← normal ← activation) traversable by tuning binding affinity.
+1.3 **Chemical-matter gap.** Known ATR/CHK1 ligands are inhibitors developed
+    for oncology synthetic-lethality strategies. State the gap as one of
+    *systematic, leakage-controlled prioritization of candidate ligands*, not
+    as a gap in modulator discovery — we are not demonstrating modulators.
+1.4 **Scope of what computation can establish here.** Short, explicit
+    paragraph: ATP-pocket occupancy does not determine functional direction.
+    The study therefore prioritizes candidates and defines the experiment that
+    would resolve their pharmacology. Stating this in the Introduction (rather
+    than burying it in Limitations) is what earns reviewer trust for
+    everything that follows.
+1.5 **Disease relevance, tiered and terminating early.** Tier 1 (literature-
+    supported): replication stress → CFS instability; ATR/CHK1 contributes to
+    replication integrity. Tier 2 (hypothesis generated here): altered
+    ATR/CHK1 signaling *might* influence the probability of
+    replication-associated rearrangement at vulnerable loci. Tier 3 (distant
+    motivation, one sentence maximum): eventual relevance to constitutional
+    genomic disorders. **Cri du Chat is not required to motivate this work and
+    should not appear in the Abstract or Results.**
+1.6 Objectives and pipeline overview (Figure 1).
 
-## 2. Computational Methods
-2.1 Target selection and structural preparation
-   - PDB IDs for ATR and CHK1 (state resolution, apo/holo, co-crystal ligand,
-     protonation protocol, missing-loop handling).
-   - Binding site definition (co-crystal ligand-derived box vs. cavity
-     detection tool).
-2.2 Seed compound library construction
-   - ChEMBL/PubChem programmatic pull of known ATR/CHK1 actives (bioactivity
-     threshold stated, e.g., IC50 < 1 µM).
-   - Deduplication, structure standardization (RDKit `MolStandardize`).
-2.3 Derivative / analog generation
-   - Method used (matched molecular pairs, BRICS recombination, R-group
-     enumeration) with parameters.
-   - Pre-filter: Lipinski/Veber/PAINS/Brenk (RDKit FilterCatalog) before
-     docking to cut compute.
-2.4 Molecular docking
-   - AutoDock Vina/Webina version, exhaustiveness, number of independent runs,
-     seed handling, box coordinates.
-   - Ensemble docking against multiple conformers/structures (if used).
-2.5 Consensus scoring and enrichment validation
-   - Second scoring function used; DUD-E-style actives/decoys AUC/EF1% for
-     the pipeline itself.
-2.6 ADMET and toxicity triage
-   - SwissADME parameters reported, ProTox-II endpoints reported, and/or
-     RDKit-computed descriptor filters as a reproducible fallback; explicit
-     pass/fail thresholds.
-2.7 Molecular dynamics
-   - OpenMM version, force fields (protein + ligand parametrization method),
-     system size, solvation/ion model, minimization/equilibration/production
-     protocol, number of replicates, simulation length, analysis metrics
-     (RMSD/RMSF, ligand residence proxy, H-bond occupancy).
-2.8 Binding free energy calculation
-   - MM-PBSA/MM-GBSA tool and settings, number of frames used, entropy
-     treatment (or explicit statement that entropy was neglected and why).
-2.9 Off-target kinome selectivity panel
-   - List of off-target kinases and PDB IDs chosen (rationale: PIKK family +
-     cell-cycle kinases), same docking/scoring protocol applied, selectivity
-     metric defined.
-2.10 Fragile-site genomic feature analysis
-   - Data sources (UCSC, HumCFS, public Repli-seq), features computed
-     (replication timing, AT content, gene size, flexibility index), and how
-     this connects back to the biological narrative (not a docking result —
-     a supporting genomics analysis).
-2.11 Statistical analysis and reproducibility statement
-   - Software version table, hardware, random seeds, code/data availability
-     (this repo + release DOI).
+## 2. Methods
+2.1 **Structural preparation.** Per structure: PDB ID, resolution, species/
+    isoform, biological construct, kinase activation state, co-crystallized
+    ligand, cofactor/metal treatment, retained vs. removed waters, alternate
+    conformations, missing residues and how modeled, protonation/tautomer
+    assignment protocol and pH. Justify why each structure represents a
+    biologically relevant state — this is a scope question, not a formality.
+2.2 **Seed library.** PubChem/ChEMBL programmatic retrieval, bioactivity
+    threshold, standardization. Record provenance per compound; the leakage
+    audit in 2.5 depends on knowing exactly what entered here.
+2.3 **Derivative generation.** BRICS/MMP enumeration with parameters, plus
+    property pre-filters. Explicitly **not claimed as methodological novelty**
+    — these are standard cheminformatics operations and are described as such.
+2.4 **Docking.** Vina version, exhaustiveness, ≥3 independent seeded runs per
+    ligand (seeds disclosed), box coordinates and their derivation, ensemble
+    docking across conformers if used.
+2.5 **Evaluation protocol (the methodological core).** Bemis-Murcko
+    scaffold-split of actives; property-matched decoy construction; explicit
+    seed↔evaluation-set leakage audit with nearest-neighbour Tanimoto
+    reported for every retained candidate; baseline (Vina alone) vs. consensus
+    vs. full-pipeline comparison; ROC-AUC, PR-AUC, EF1%/EF5% with bootstrap
+    confidence intervals. Weights, splits, and metrics **pre-specified before
+    running** — state this, and report the result in whichever direction it
+    falls.
+2.6 **In silico developability and toxicity prediction.** (Renamed from
+    "ADMET triage.") Descriptor rules computed reproducibly in RDKit;
+    SwissADME/ProTox-II outputs reported as *predictions* with access dates
+    and versions. Thresholds justified or presented as continuous scores.
+    State plainly: predicted absence of toxicity is not evidence of safety.
+2.7 **Molecular dynamics.** OpenMM version, force fields (protein + ligand
+    parametrization), solvation/ion model, system size, minimization/
+    equilibration/production protocol. **≥3 replicas from different initial
+    velocities/coordinates, RNG seeds disclosed, convergence assessment and
+    replicate-to-replicate variance reported** (per JCIM MD reporting
+    guidelines, DOI 10.1021/acs.jcim.3c00599 — adopted regardless of target
+    journal). Analyses: protein and ligand RMSD, RMSF, contact persistence,
+    H-bond occupancy, clustering. An RMSD plateau is reported as conformational
+    stability, never as evidence of binding strength.
+2.8 **MM-PBSA relative energetic estimation.** Tool, settings, frames used,
+    frame correlation, dielectric assumptions, entropy treatment (neglected by
+    default — stated, not hidden), error estimation, sensitivity to trajectory
+    window. Reported as relative ranking energetics, never as ΔG or affinity.
+2.9 **Predicted cross-kinase selectivity analysis.** (Renamed from "kinome
+    panel.") Off-target kinases with PDB IDs and rationale (PIKK family first).
+    Scores z-normalized **within each receptor** against a property-matched
+    background set docked into that same structure, because raw scores are not
+    comparable across proteins. Metric benchmarked against reference
+    inhibitors with published experimental kinome profiles.
+2.10 **Integrated ranking.** Pre-specified desirability weights with stated
+    rationale, **plus** Monte-Carlo sensitivity analysis over the weight
+    simplex reporting how often each candidate remains top-ranked.
+2.11 **Reproducibility.** Software version table, hardware, all seeds, code
+    repository and archived release DOI.
+2.12 *(Supporting Information)* CFS genomic feature analysis — data sources
+    and features computed. Moved out of the main Methods; its role is to
+    specify the terminal experimental prediction (§4.5), not to inform
+    compound selection.
 
 ## 3. Results
-3.1 Seed library and derivative set characterization (chemical space plot —
-    PCA/UMAP over descriptors, scaffold diversity).
-3.2 Docking enrichment validation (pipeline AUC/EF on known actives/decoys) —
-    establishes the pipeline works before reporting novel hits.
-3.3 Docking + consensus scoring results for derivative library — ranked
-    table, top N hits.
-3.4 ADMET/toxicity triage outcomes — how many survived, why compounds were
-    excluded, property distributions before/after.
-3.5 MD stability and MM-PBSA binding free energies for shortlisted hits —
-    ΔG with error bars, per-residue energy decomposition for top 2-3 hits.
-3.6 Selectivity profiling — heatmap of predicted affinity across target +
-    off-target panel; selectivity score ranking.
-3.7 Fragile-site genomic feature results — descriptive statistics tying
-    FRA3B/FRA16D features to the mechanistic narrative (supports Introduction/
-    Discussion, doesn't need to "prove" anything about the compounds).
-3.8 Integrated multi-objective ranking (desirability function combining
-    affinity, selectivity, ADMET, synthetic accessibility) → final candidate
-    list (e.g., top 3-5 "lead-like modulators").
+Ordered so the pipeline must earn trust before it is used. This ordering is
+the paper's main structural argument.
+
+3.1 **Does the pipeline recover known chemistry?** Scaffold-split retrieval on
+    held-out actives: ROC-AUC, PR-AUC, EF1%/EF5% with CIs. Leakage audit
+    reported here, not in SI.
+3.2 **Does it beat simpler approaches?** Baseline Vina vs. consensus vs. full
+    pipeline, per-stage contribution. Report faithfully — a null result here
+    is the finding, not a failure (Figure 3).
+3.3 **Chemical space of the derivative set.** Framed as a question — did
+    derivative generation expand accessible chemical space while retaining
+    ATR/CHK1-like character? — not as a decorative PCA plot.
+3.4 **Candidate ranking under docking and consensus scoring.**
+3.5 **Predicted developability outcomes.** How many candidates survived, why
+    others were excluded, property distributions before/after.
+3.6 **Conformational robustness (MD).** Replicate variance shown, not hidden.
+3.7 **MM-PBSA relative energetics** with uncertainty.
+3.8 **Predicted cross-kinase selectivity**, including the reference-compound
+    benchmark that establishes whether the metric is trustworthy at all.
+3.9 **Integrated ranking and its stability** under weight perturbation.
+
+Presented as five distinct evidence dimensions — pose plausibility, retrieval
+performance, conformational robustness, predicted developability, predicted
+selectivity — **not** as four independent confirmations of one truth. Their
+assumptions overlap and their uncertainties are correlated; say so.
 
 ## 4. Discussion
-4.1 Interpretation of top candidates relative to known ATR/CHK1 pharmacology
-    (compare to berzosertib/ceralasertib/prexasertib/SRA737 as reference
-    points, not templates being re-discovered).
-4.2 Revisit the activation-vs-hyperactivation framing with the MM-PBSA/MD
-    data — does anything in the results support the "mid-affinity window"
-    hypothesis?
-4.3 Selectivity liabilities and structural rationale (e.g., hinge-region
-    similarity across PIKK family).
-4.4 Explicit limitations: single/limited-conformer docking bias, MM-PBSA
-    entropy approximation, no explicit cellular/phenotypic validation, the
-    Tier 2 disease-relevance hypothesis remains untested in vivo.
-4.5 Translational path — what wet-lab experiments would be the immediate next
-    step (kinase assay, cellular replication-stress reporter, CFS expression
-    assay under aphidicolin) — framing this as hypothesis-generating in
-    silico work, consistent with journal expectations for pure computational
-    studies.
+4.1 Comparison with known ATR/CHK1 pharmacology, quantitatively — avoid
+    anecdotal "our docking recovered known inhibitors" claims.
+4.2 The engagement-range hypothesis, explicitly labelled untested: the
+    candidate set spans a range of predicted target engagement, providing a
+    framework for determining experimentally whether functional effects vary
+    non-monotonically with engagement. Never stated as a demonstrated
+    mechanism.
+4.3 Predicted selectivity liabilities — and the more interesting mechanistic
+    question of whether they arise because kinase ATP pockets are intrinsically
+    hard to discriminate structurally. Turns a negative result into insight.
+4.4 **Limitations.** Chemical-space bias from ChEMBL-derived seeds; residual
+    benchmark leakage risk; non-equivalence of docking scores across targets;
+    predicted-ADMET uncertainty; MM-PBSA model dependence; protein-state and
+    regulatory-context uncertainty (ATR function depends on ATRIP/TOPBP1/ETAA1
+    context absent from these models); and — stated so it cannot be missed —
+    **no functional directionality: computational binding does not establish
+    activation versus inhibition.**
+4.5 **Translational path.** Staged and specific: biochemical ATR/CHK1 kinase
+    assay → cellular checkpoint signaling readout → replication-fork phenotype
+    → CFS-specific readout (FRA3B/FRA16D gap-and-break frequency under
+    aphidicolin versus replication-timing-matched non-fragile control loci,
+    the loci specified by the SI genomic analysis). This is where the CFS
+    biology does real work: it makes the hypothesis falsifiable at a named
+    locus with a named assay.
 
 ## 5. Conclusion
-- 3-4 sentences: what was found, what the pipeline contributes as an
-  open-source resource, and the explicit next experimental step.
+Restrained. Something close to: *"We report a reproducible, leakage-controlled
+computational framework that prioritizes candidate ATR and CHK1 ligands and
+benchmarks its own retrieval performance against baseline docking, yielding a
+candidate set and a specified experimental test."* Never: *"we developed
+modulators that suppress replication stress."*
+
+## Figures (6 main text)
+1. Pipeline schematic, with the evidentiary boundary drawn on it.
+2. Chemical space, seed vs. derivative set.
+3. **Benchmarking (the methodological heart):** (A) actives/decoy
+   construction, (B) baseline docking ROC/PR, (C) consensus ROC/PR, (D)
+   held-out performance, (E) scaffold-split performance. Note: "held-out",
+   never "prospective" — there is no prospective validation without experiments.
+4. Binding poses — illustrative of predicted interactions, explicitly not
+   offered as mechanistic proof.
+5. MD replicate variance + MM-PBSA **estimated relative energetics** with
+   uncertainty (axis label must not read ΔG).
+6. Predicted cross-kinase selectivity heatmap, with the reference-compound
+   benchmark panel alongside it.
 
 ## Supporting Information
-- Full compound table (SMILES, all scores) as CSV.
-- Full software/version table.
-- MD trajectory analysis plots for all shortlisted compounds (not just top
-  hits).
-- Code repository link + release tag/DOI.
-
-## Figures (suggested, 5-6 main text)
-1. Pipeline schematic (target → seed library → derivatives → docking →
-   ADMET → MD/MM-PBSA → selectivity → ranked candidates).
-2. Chemical space plot of seed vs. derivative library.
-3. Enrichment (ROC) curve for pipeline validation.
-4. Top-hit binding pose figure(s) with key interactions annotated.
-5. MD RMSD/RMSF + MM-PBSA ΔG bar chart with error bars.
-6. Selectivity heatmap across kinase panel.
+CFS genomic feature analysis; full compound table (SMILES + all scores);
+software/version table; per-replicate MD analyses for all shortlisted
+compounds; pre-specified analysis plan; code repository and release DOI.

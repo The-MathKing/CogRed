@@ -101,10 +101,11 @@ def run_vina(receptor_pdbqt: Path, ligand_pdbqt: Path, box: DockingBox,
 
 def dock_library(compound_csv: str, receptor_pdb: str, box: DockingBox,
                   target_name: str, work_dir: str = "data/docking",
-                  n_replicates: int = 3) -> pd.DataFrame:
+                  n_replicates: int = 3) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Dock every SMILES in `compound_csv` against one receptor, `n_replicates`
-    independent Vina runs per ligand (different seeds) for score stability
-    (critique doc: 'Report triplicate docking with different seeds')."""
+    independent Vina runs per ligand (different seeds) for score stability.
+
+    Returns (per-run results, per-compound summary)."""
     work = Path(work_dir) / target_name
     work.mkdir(parents=True, exist_ok=True)
 
@@ -136,7 +137,7 @@ if __name__ == "__main__":
     # (e.g., via `obabel` centroid calc or a quick RDKit/Biopython script).
     box = DockingBox(center_x=0.0, center_y=0.0, center_z=0.0)
     results, summary = dock_library(
-        compound_csv="data/admet_ready_compounds.csv",
+        compound_csv="data/developability_passed_compounds.csv",
         receptor_pdb="data/receptors/CHK1.pdb",
         box=box,
         target_name="CHK1",
