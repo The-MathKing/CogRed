@@ -19,18 +19,24 @@ Start here:
 
 - **[`manuscript/submission/paper.pdf`](manuscript/submission/paper.pdf)** —
   a real, fully executed, submittable pilot paper (LaTeX source in the same
-  folder). A later session found that this "sandboxed" environment actually
-  has pip access to PyPI (real `vina`, `openmm`, `openbabel-wheel` install
-  from there), read access to the RCSB PDB's AWS Open Data mirror
-  (`s3://pdbsnapshots`, reachable even though `rcsb.org` is not), and apt
-  access (a full LaTeX toolchain installs cleanly) — so this paper's central
-  finding is real, not a placeholder: **a redocking validation control
-  reproducibly passed one 2025 ATR structure (9L4B) and failed another
-  (9L40) solved in the same study**, and a 40-compound BRICS-derived pilot
-  library was actually docked against the validated structure. Scope is
-  deliberately much narrower than the full pipeline below (single target,
-  no MD/MM-GBSA — no GPU available — no kinome panel); see
-  `data/pilot_run_v1/README.md` for the real data behind every number in it.
+  folder). This "sandboxed" environment actually has pip access to PyPI
+  (real `vina`, `openmm`, `openbabel-wheel`, `spyrmsd` install from there),
+  read access to the RCSB PDB's AWS Open Data mirror (`s3://pdbsnapshots`,
+  reachable even though `rcsb.org` is not — including its wwPDB validation
+  reports), and apt access (a full LaTeX + PyMOL toolchain installs
+  cleanly) — so this paper's central finding is real, not a placeholder:
+  **a redocking validation control reproducibly passed one 2025 ATR
+  structure (9L4B, 3.20 Å) and failed another (9L40, 2.87 Å — the
+  *higher*-resolution of the two) solved in the same study**, a finding
+  that survives symmetry-corrected RMSD, ruling out the adjacent allosteric
+  site as a confound, and re-validation at the exhaustiveness actually used
+  for screening. A 40-compound BRICS-derived pipeline sanity-check screen
+  was then docked against the validated structure. Scope is deliberately
+  much narrower than the full pipeline below (single target, no MD/MM-GBSA
+  — no GPU available — no kinome panel, n=1 on the central finding); see
+  `data/pilot_run_v1/README.md` for the real data behind every number in
+  it, and `docs/06_review_response_round3.md` for what a third external
+  review tried to break and what survived.
 - **[`manuscript/draft_v1.md`](manuscript/draft_v1.md)** — the earlier,
   fully-`[PENDING]` draft against the *original*, larger-scope pipeline
   below, written when PubChem/ChEMBL/UCSC/RCSB and Vina/OpenMM/AmberTools

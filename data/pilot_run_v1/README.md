@@ -60,3 +60,45 @@ Receptor PDBQT/PDB/mmCIF files themselves are not included here (large,
 regenerable, and already excluded from version control by `.gitignore`);
 re-download from `s3://pdbsnapshots` (snapshot `20260101`) as documented in
 `manuscript/submission/paper.tex` §Methods.
+
+## `validation_analysis/` — added in response to external review round 3
+
+A second external review of `paper.pdf` (round 2's output) tried, and
+mostly failed, to break the central redocking-failure finding, and raised
+several checkable alternative explanations. Rather than take either the
+review's or the paper's own numbers on faith, each was independently
+re-verified or newly computed:
+
+- `symmrmsd_results.json` / `compute_symmrmsd.py` — symmetry-corrected RMSD
+  (spyrmsd) for all three redocking validations, addressing the concern
+  that naive index-matched RMSD overstates error for symmetric ligands
+  (berzosertib has more internal symmetry than the other two). Result: the
+  9L40 failure narrows (2.96→2.53 Å) but does not close (still >2.0 Å) —
+  confirmed independently, not just asserted. Includes the two sanity
+  controls the review requested: crystal-vs-itself (exactly 0.000 Å) and a
+  known 1.0 Å perturbation (recovered as exactly 1.000 Å).
+- `redocking_replicate_results_ex16.json` / `run_redocking_replicates_ex16.py`
+  — the full redocking validation re-run at exhaustiveness 16 (matching the
+  exhaustiveness actually used for the pilot library screen, vs. 32 used in
+  the original validation), to close a real self-contradiction the review
+  caught (the paper called the two protocols "identical" when they weren't).
+  Same pass/fail pattern holds at 16 as at 32.
+- `9l40_wwpdb_validation.xml` / `9l4b_wwpdb_validation.xml` — official wwPDB
+  validation reports (retrieved from the same `s3://pdbsnapshots` mirror),
+  used to check the deposited ligand pose's map-model fit (Q-score,
+  residue inclusion) as an alternative explanation for the redocking
+  failure independent of the docking protocol itself.
+- `redocked_poses/*.sdf` — the docked poses (converted from Vina PDBQT
+  output via Open Babel) used as input to the symmetry-RMSD computation
+  above.
+- `make_overlay_figure.pml` — the PyMOL script that generated
+  `manuscript/submission/figure_redocking_overlay.png` (native vs. redocked
+  pose, both structures) — added because the paper previously reported a
+  geometric finding with no figure showing any geometry.
+
+Also computed but not saved as a separate file here (values are in
+`paper.tex` §Methods directly, since they were single quick calculations
+rather than saved pipeline outputs): the 60.65 Å centroid-to-centroid
+distance from 9L40's active-site ligand to its nearest allosteric-site
+copy, ruling out the docking box reaching the emptied allosteric pocket as
+a confound.

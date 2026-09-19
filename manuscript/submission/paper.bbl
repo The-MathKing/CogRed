@@ -1,4 +1,4 @@
-\begin{thebibliography}{17}
+\begin{thebibliography}{20}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
@@ -45,6 +45,16 @@ Xuejuan Wang et~al.
 \newblock \emph{Science Bulletin}, 70\penalty0 (13):\penalty0 2137--2146, 2025.
 \newblock \doi{10.1016/j.scib.2025.05.009}.
 
+\bibitem[Hartshorn et~al.(2007)Hartshorn, Verdonk, Chessari, Brewerton, Mooij,
+  Mortenson, and Murray]{hartshorn2007}
+Michael~J. Hartshorn, Marcel~L. Verdonk, Gianni Chessari, Suzanne~C. Brewerton,
+  Wijnand T.~M. Mooij, Paul~N. Mortenson, and Christopher~W. Murray.
+\newblock Diverse, high-quality test set for the validation of protein-ligand
+  docking performance.
+\newblock \emph{Journal of Medicinal Chemistry}, 50\penalty0 (4):\penalty0
+  726--741, 2007.
+\newblock \doi{10.1021/jm061277y}.
+
 \bibitem[Trott and Olson(2010)]{trott2010}
 Oleg Trott and Arthur~J. Olson.
 \newblock Autodock vina: improving the speed and accuracy of docking with a new
@@ -71,6 +81,14 @@ Noel~M. O'Boyle, Michael Banck, Craig~A. James, Chris Morley, Tim
   Vandermeersch, and Geoffrey~R. Hutchison.
 \newblock Open babel: An open chemical toolbox.
 \newblock \emph{Journal of Cheminformatics}, 2011.
+
+\bibitem[Pintilie et~al.(2020)Pintilie, Zhang, Su, Li, Schmid, and
+  Chiu]{pintilie2020}
+Grigore Pintilie, Kai Zhang, Zhaoming Su, Shiheng Li, Michael~F. Schmid, and
+  Wah Chiu.
+\newblock Measurement of atom resolvability in cryo-em maps with q-scores.
+\newblock \emph{Nature Methods}, 17:\penalty0 328--334, 2020.
+\newblock \doi{10.1038/s41592-020-0731-1}.
 
 \bibitem[{RDKit}(2024)]{rdkit}
 {RDKit}.
@@ -106,5 +124,11 @@ Arup~K. Ghose, Vellarkad~N. Viswanadhan, and John~J. Wendoloski.
 William~J. Egan, Kenneth~M. Merz, and John~J. Baldwin.
 \newblock Prediction of drug absorption using multivariate statistics.
 \newblock \emph{Journal of Medicinal Chemistry}, 2000.
+
+\bibitem[Meli and Biggin(2020)]{meli2020}
+Rocco Meli and Philip~C. Biggin.
+\newblock spyrmsd: symmetry-corrected rmsd calculations in python.
+\newblock \emph{Journal of Cheminformatics}, 12:\penalty0 49, 2020.
+\newblock \doi{10.1186/s13321-020-00455-2}.
 
 \end{thebibliography}

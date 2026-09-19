@@ -1,0 +1,80 @@
+{
+  "9l40_ATR_VE822": {
+    "seeds": [
+      1000,
+      1001,
+      1002
+    ],
+    "replicate_vina_scores_kcal_mol": [
+      -10.519,
+      -10.485,
+      -10.455
+    ],
+    "replicate_redocking_rmsd_angstrom": [
+      2.9307880802658834,
+      3.067101363083483,
+      3.042353778620385
+    ],
+    "mean_redocking_rmsd_angstrom": 3.0134144073232503,
+    "std_redocking_rmsd_angstrom": 0.05929273804007128,
+    "passes_2.0A_threshold_all_replicates": false,
+    "search_reproducibility_pairwise_rmsd_angstrom": [
+      0.8141161728261772,
+      0.8135310512995646,
+      0.06942189856233986
+    ],
+    "mean_search_reproducibility_rmsd": 0.5656897075626939
+  },
+  "9l4b_ATR_camonsertib": {
+    "seeds": [
+      1000,
+      1001,
+      1002
+    ],
+    "replicate_vina_scores_kcal_mol": [
+      -10.787,
+      -10.763,
+      -10.784
+    ],
+    "replicate_redocking_rmsd_angstrom": [
+      0.5860230655301316,
+      0.6216879442292584,
+      0.5712157502497037
+    ],
+    "mean_redocking_rmsd_angstrom": 0.5929755866696979,
+    "std_redocking_rmsd_angstrom": 0.021183543202598524,
+    "passes_2.0A_threshold_all_replicates": true,
+    "search_reproducibility_pairwise_rmsd_angstrom": [
+      0.057410800377630335,
+      0.05174359863790039,
+      0.09503578273471801
+    ],
+    "mean_search_reproducibility_rmsd": 0.06806339391674958
+  },
+  "2ym8_CHK1_YM8": {
+    "seeds": [
+      1000,
+      1001,
+      1002
+    ],
+    "replicate_vina_scores_kcal_mol": [
+      -7.55,
+      -7.542,
+      -7.538
+    ],
+    "replicate_redocking_rmsd_angstrom": [
+      0.9249168731417013,
+      0.9115428110057674,
+      0.9207532946612949
+    ],
+    "mean_redocking_rmsd_angstrom": 0.9190709929362546,
+    "std_redocking_rmsd_angstrom": 0.005588022239547177,
+    "passes_2.0A_threshold_all_replicates": true,
+    "search_reproducibility_pairwise_rmsd_angstrom": [
+      0.0394231554442967,
+      0.031525415966357356,
+      0.04137587416554449
+    ],
+    "mean_search_reproducibility_rmsd": 0.03744148185873285
+  }
+}

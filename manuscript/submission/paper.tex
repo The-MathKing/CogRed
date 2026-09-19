@@ -28,38 +28,39 @@
 \noindent
 \textbf{Background:} Nearly all existing chemical probes of the ATR--CHK1
 replication-stress checkpoint are ATP-competitive kinase inhibitors. Two
-near-atomic-resolution cryo-EM structures of the human ATR--ATRIP complex
-released in 2025 (PDB 9L40, bound to berzosertib/VE-822; PDB 9L4B, bound to
+2025 cryo-EM structures of the ATR kinase domain (PDB 9L40, 2.87~{\AA},
+bound to berzosertib/VE-822; PDB 9L4B, 3.20~{\AA}, bound to
 camonsertib/RP-3500) provide new templates for structure-based work on this
-target, and 9L40 additionally revealed a second, allosteric berzosertib
-binding site at the ATR--ATR dimer interface distinct from the canonical
-ATP pocket. Whether newly deposited structures of this kind are equally
-reliable for conventional ATP-pocket docking is not something resolution
-alone can guarantee. \textbf{Methods:} We assembled a small seed library of
-five ATR/CHK1-directed compounds, three extracted directly from the
+target, and companion depositions revealed berzosertib additionally
+engaging an allosteric site at the ATR--ATR dimer interface, distinct from
+the canonical ATP pocket. Whether a newly deposited structure is reliable
+for conventional ATP-pocket docking is not something resolution alone can
+guarantee. \textbf{Methods:} We assembled a small seed library of five
+ATR/CHK1-directed compounds, three extracted directly from the
 co-crystallized active-site ligand of PDB 9L40, 9L4B, and a CHK1 reference
 structure (PDB 2YM8), generated derivatives by BRICS recombination,
-filtered for developability by standard descriptor rules, and --
-before docking any candidate -- validated each receptor structure by
-redocking its own native ligand against a pre-specified 2.0~{\AA} RMSD pass
-threshold, repeated across three independent seeded AutoDock Vina runs.
-\textbf{Results:} Redocking succeeded for 9L4B (mean RMSD
-$0.61\pm0.02$~{\AA}) and 2YM8 ($0.90\pm0.01$~{\AA}) but reproducibly
-\emph{failed} for 9L40 ($2.96\pm0.06$~{\AA} across all three seeds, despite
-tight search reproducibility of $0.56$~{\AA} pairwise), so 9L40 was excluded
-from candidate scoring per the pre-specified rule. A 40-compound pilot set
-(5 seeds + 35 developability-passed BRICS derivatives) was then docked
-against the validated 9L4B structure: predicted affinities ranged from
-$-9.80$ to $-7.82$~kcal/mol (best pose across three seeded replicates), with
-camonsertib itself -- the receptor's own co-crystallized ligand -- ranking
-first as expected; no derivative exceeded the best seed compound, and the
-top-ranked derivatives were close BRICS analogs of camonsertib sharing its
-oxabicyclic-ether/pyrazolopyrazine core with a single substituent varied.
+filtered for developability by standard descriptor rules, and -- before
+docking any candidate -- validated each receptor by redocking its own
+native ligand (naive and symmetry-corrected RMSD, three seeded AutoDock
+Vina replicates) against a pre-specified 2.0~{\AA} pass threshold.
+\textbf{Results:} Redocking passed for 9L4B ($0.61\pm0.02$~{\AA}) and 2YM8
+($0.76$--$0.90$~{\AA}) but reproducibly \emph{failed} for 9L40 (naive
+$2.96\pm0.06$~{\AA}, symmetry-corrected $2.53\pm0.01$~{\AA} -- still over
+threshold) despite looser-than-passing but still self-consistent search
+reproducibility ($0.56$~{\AA}); notably, 9L40 is the \emph{higher}-resolution
+structure of the two. Two alternative explanations were tested and ruled
+out: the docking box cannot reach the nearby allosteric site
+(60.65~{\AA} away), and the deposited pose is not an outlier by map-model
+Q-score (though residue inclusion is somewhat lower). 9L40 was excluded
+from scoring per the pre-specified rule. A 40-compound sanity-check screen
+(5 seeds + 35 developability-passed derivatives) against the validated
+9L4B structure recovered camonsertib -- the receptor's own ligand -- as
+top-ranked, with no derivative exceeding the seed compounds.
 \textbf{Conclusions:} A newly deposited, high-resolution structure is not
-automatically a reliable docking receptor, and this can only be established
-empirically, per structure, before any candidate is scored -- not assumed
-from resolution or recency. All code, data, and structures used are openly
-available for independent verification.
+automatically a reliable docking receptor; this can only be established
+empirically, per structure and per protocol, before any candidate is
+scored. This n=1 finding motivates a larger survey using the same
+pipeline. All code, data, and structures are openly available.
 \end{abstract}
 
 \noindent\textbf{Keywords:} ATR kinase; molecular docking; redocking
@@ -82,29 +83,35 @@ Essentially all existing chemical matter directed at this pathway --
 berzosertib, ceralasertib, camonsertib, prexasertib, and related compounds
 -- is ATP-competitive kinase inhibitors developed for oncology
 synthetic-lethality strategies \citep{fokas2012}. Two cryo-EM structures of
-the full human ATR--ATRIP complex released in 2025, bound respectively to
-berzosertib (PDB 9L40) and camonsertib (PDB 9L4B) at $\sim$3~{\AA}
-resolution, are a substantial improvement over the original 2018 structure
-of the complex (PDB 5YZ0, 4.7~{\AA}) and newly resolved that one ATR--ATRIP
-complex engages \emph{four} berzosertib molecules -- two in the canonical
-ATP-competitive active sites, and two at a previously uncharacterized
-allosteric pocket formed at the ATR--ATR dimer interface
-\citep{wang2025}. This is a structurally more complex picture than a single
-ATP-pocket story, and it raises a practical question for anyone using these
-new structures for docking: does a newly deposited, high-resolution
-structure automatically make a trustworthy receptor for conventional
-ATP-pocket virtual screening?
+a homodimer of the ATR kinase domain released in 2025 -- bound respectively
+to berzosertib (PDB 9L40, 2.87~{\AA}) and camonsertib (PDB 9L4B,
+3.20~{\AA}) -- are a substantial improvement over the original 2018
+structure of the full ATR--ATRIP complex (PDB 5YZ0, 4.7~{\AA}), and,
+together with companion depositions of the complete ATR--ATRIP assembly
+from the same study, newly resolved that one such assembly engages
+\emph{four} berzosertib molecules -- two in the canonical ATP-competitive
+active sites, and two at a previously uncharacterized allosteric pocket
+formed at the ATR--ATR dimer interface \citep{wang2025}. This is a
+structurally more complex picture than a single ATP-pocket story, and it
+raises a practical question for anyone using these new structures for
+docking: does a newly deposited, high-resolution structure automatically
+make a trustworthy receptor for conventional ATP-pocket virtual screening?
+As will become apparent below, the answer this pilot finds is no -- and,
+notably, it is the \emph{higher}-resolution of the two structures (9L40,
+2.87~{\AA}) that fails.
 
 This is an empirical question, not one that follows from resolution or
 recency, and it is the question this pilot study is organized around. Before
 screening any candidate against 9L40 or 9L4B, we validate each structure's
 suitability as a docking receptor by redocking its own co-crystallized
-ligand -- the standard control for docking-protocol accuracy
-\citep{trott2010} -- and only proceed to score novel candidates against a
-structure that passes. We then report a modest pilot screen of BRICS-derived
-\citep{degen2008} candidates against whichever structure(s) pass, as a
-demonstration of the validate-before-screening principle applied to a
-concrete, currently topical target.
+ligand -- the standard control for docking-protocol accuracy, following the
+convention established on the Astex Diverse Set \citep{hartshorn2007} and
+implemented here with AutoDock Vina \citep{trott2010} -- and only proceed to
+score novel candidates against a structure that passes. We then report a
+small pipeline sanity-check screen of BRICS-derived \citep{degen2008}
+candidates against whichever structure(s) pass, as a demonstration of the
+validate-before-screening principle applied to a concrete, currently topical
+target.
 
 \subsection*{Scope}
 
@@ -131,33 +138,61 @@ Three receptor structures were obtained, in mmCIF format, via the
 Registry of Open Data on AWS mirror of the RCSB PDB archive
 (\url{s3://pdbsnapshots}, snapshot 2026-01-01), since the primary RCSB PDB
 web/FTP endpoints were not reachable from the compute environment used for
-this study: PDB 9L40 (ATR kinase domain bound to VE-822/berzosertib,
-$\sim$2.9~{\AA}), PDB 9L4B (ATR kinase domain bound to
-camonsertib/RP-3500, $\sim$3~{\AA}), and PDB 2YM8 (human CHK1 kinase domain
+this study: PDB 9L40 (ATR kinase domain, homodimer, bound to
+VE-822/berzosertib, 2.87~{\AA}), PDB 9L4B (ATR kinase domain, homodimer,
+bound to camonsertib/RP-3500, 3.20~{\AA}), and PDB 2YM8 (human CHK1 kinase
+domain
 bound to a chloroisoquinolinylamino-pyrazine-carbonitrile inhibitor,
 2.07~{\AA}) \citep{wang2025}. The original 2018 ATR--ATRIP structure
 (PDB 5YZ0, 4.7~{\AA} overall) was not used as a docking receptor: at that
 resolution, ATP-pocket side-chain positions are not reliably resolved.
 
-For each structure, protein chains were extracted (standard residues only,
-via Biopython \citep{cock2009}), and the co-crystallized ligand of the
-biologically relevant ATP-competitive active site was identified and
-isolated. For 9L40, four copies of the ligand (chemical component
-\texttt{A1EIE}) are present per asymmetric unit; contact analysis (heavy
-atoms within 4.5~{\AA} of each protein chain) confirmed that residues
-A2701/B2701 each contact only their own chain (canonical, single-monomer
-ATP-competitive site) while A2702/B2702 contact both chains (the
-dimer-interface allosteric site reported by \citet{wang2025}); A2701 was
-used as the active-site reference ligand. The analogous single-copy
-active-site ligands (chemical component \texttt{A1EIK} for 9L4B;
-\texttt{YM8} for 2YM8) were extracted directly. New-style five-character PDB
-chemical-component codes overflow the fixed-width residue-name column of
-the legacy PDB format and silently corrupt naive PDB-to-PDBQT conversion
-(each atom is parsed as an isolated one-atom fragment); ligand records were
-therefore rewritten with a placeholder three-character residue name before
-conversion. Proteins and ligands were converted to PDBQT with Open Babel
-\citep{oboyle2011}, and docking search boxes were centered on each
-active-site ligand's heavy-atom centroid (22~{\AA} cubic box).
+For each structure, \emph{both} protein chains (the full homodimer; standard
+residues only, via Biopython \citep{cock2009}) were retained as the docking
+receptor, and the co-crystallized ligand of the biologically relevant
+ATP-competitive active site was identified and isolated. For 9L40, four
+copies of the ligand (chemical component \texttt{A1EIE}) are present per
+asymmetric unit; contact analysis (heavy atoms within 4.5~{\AA} of each
+protein chain) confirmed that residues A2701/B2701 each contact only their
+own chain (canonical, single-monomer ATP-competitive site) while
+A2702/B2702 contact both chains (the dimer-interface allosteric site
+reported by \citet{wang2025}); A2701 was used as the active-site reference
+ligand. The centroid-to-centroid distance from A2701 to the nearest
+allosteric copy (A2702) is 60.65~{\AA} -- far outside the reach of the
+22~{\AA} docking box used here (Table~\ref{tab:redocking} below), which
+rules out the empty allosteric cavity as a confound for the redocking result
+that follows: the docking box could not have reached it. The analogous
+single-copy active-site ligands (chemical component \texttt{A1EIK} for
+9L4B; \texttt{YM8} for 2YM8) were extracted directly. New-style
+five-character PDB chemical-component codes overflow the fixed-width
+residue-name column of the legacy PDB format and silently corrupt naive
+PDB-to-PDBQT conversion (each atom is parsed as an isolated one-atom
+fragment); ligand records were therefore rewritten with a placeholder
+three-character residue name before conversion. Proteins and ligands were
+converted to PDBQT with Open Babel \citep{oboyle2011}, and docking search
+boxes were centered on each active-site ligand's heavy-atom centroid
+(22~{\AA} cubic box).
+
+To assess whether the deposited ligand pose itself is well supported by the
+experimental map -- an alternative explanation for a redocking failure that
+is independent of the docking protocol -- we retrieved the official wwPDB
+validation report (XML) for 9L40 and 9L4B from the same AWS mirror. For the
+active-site ligand copy used as the redocking reference in each structure,
+the real-space correlation-based Q-score \citep{pintilie2020} and fractional
+residue inclusion (the proportion of the ligand's atoms with adequate
+density support) were: 9L40/A2701, Q-score 0.553, residue inclusion 0.818;
+9L4B/A2701, Q-score 0.528, residue inclusion 0.967. The Q-scores are
+comparable (if anything marginally higher for 9L40), so the deposited
+berzosertib pose is not obviously a poorly resolved outlier by that metric;
+residue inclusion is nonetheless visibly lower for 9L40, indicating a
+somewhat less complete density match for that pose. This does not, by
+itself, explain a 2+~{\AA} redocking discrepancy, but it is reported here
+in full rather than omitted, since it bears on how confidently the
+redocking result should be interpreted (see Discussion). For reference, the
+two allosteric-site copies in 9L40 (A2702, B2702) score
+markedly lower still (Q-score 0.385/0.422, residue inclusion 0.364/0.485),
+consistent with the dimer-interface pocket being a more weakly resolved,
+peripheral region of the map.
 
 \subsection*{Seed compound library}
 
@@ -217,11 +252,21 @@ Before any candidate was scored, each receptor was validated by extracting
 its own active-site ligand, redocking it into the identical receptor/box
 with AutoDock Vina \citep{trott2010} (exhaustiveness 32, three independent
 seeded replicates: 1000, 1001, 1002), and computing the root-mean-square
-deviation (RMSD, heavy atoms, index-matched -- Vina's PDBQT output
-preserves input atom order) between the best-scoring pose and the native
+deviation (RMSD, heavy atoms) between the best-scoring pose and the native
 crystallographic pose, against a pre-specified pass threshold of
-$\leq$2.0~{\AA}, fixed before any receptor was tested. A receptor failing
-this control in any replicate is excluded from candidate scoring, with the
+$\leq$2.0~{\AA} \citep{hartshorn2007}, fixed before any receptor was tested.
+Two RMSD variants are reported: a naive, index-matched RMSD (valid here
+because the docked pose and the input ligand file share atom order by
+construction within a single Vina run), and a symmetry-corrected RMSD
+computed with spyrmsd \citep{meli2020} via graph-isomorphism atom matching,
+since naive index-matched RMSD can overstate pose error for ligands with
+internal topological symmetry (e.g. equivalent ring or sulfone atoms).
+Before applying either metric to real poses, both were checked against two
+controls: a molecule scored against its own unperturbed coordinates (must
+return exactly 0.00~{\AA}), and a molecule subjected to a known, exact
+1.0~{\AA} rigid translation (must return exactly 1.00~{\AA}); both controls
+passed for all three ligands (Results). A receptor failing the redocking
+control in any replicate is excluded from candidate scoring, with the
 reason stated, rather than retried until it passes. Search reproducibility
 (pairwise RMSD between replicate best poses, independent of whether that
 pose is correct) was reported separately from redocking accuracy (RMSD to
@@ -232,11 +277,23 @@ the native pose), since these answer different questions.
 The 5 seed compounds plus the top 35 developability-passed derivatives
 (ranked by number of rules satisfied, then by molecular weight ascending)
 were docked against every receptor structure that passed redocking
-validation, using the identical protocol (AutoDock Vina, exhaustiveness 16,
-three independent seeded replicates: 2000, 2001, 2002). Ligands were
-3D-embedded and protonated at pH 7.4 with Open Babel. The best (most
-negative) affinity across replicates is reported per compound, alongside
-the mean and standard deviation across replicates.
+validation, using AutoDock Vina at exhaustiveness 16 (three independent
+seeded replicates: 2000, 2001, 2002) -- a lower exhaustiveness than the 32
+used for redocking validation itself, for compute-cost reasons. Because the
+central claim of this pilot is that a receptor must be validated under the
+protocol it will actually be screened with, this discrepancy is a real
+weakness in the original design, and we closed it directly rather than
+assert the two protocols were equivalent: the redocking validation was
+re-run in full (three seeded replicates, same seeds 1000/1001/1002) at
+exhaustiveness 16, and the same pass/fail pattern held (Results) -- 9L40
+still fails ($3.01\pm0.06$~{\AA}), 9L4B and 2YM8 still pass
+($0.59\pm0.02$~{\AA} and $0.92\pm0.01$~{\AA}) -- so the reliability
+conclusion does not depend on which of the two exhaustiveness settings is
+used. Ligands were 3D-embedded and protonated at pH 7.4 with Open Babel.
+The best (most negative) affinity across replicates is reported per
+compound alongside the mean and standard deviation; the mean is the primary
+statistic discussed in Results, since the best-of-three is a biased
+(downward) estimator.
 
 \subsection*{Computational environment}
 
@@ -253,34 +310,74 @@ submission (see Availability of data and materials).
 \subsection*{Redocking validation: one of two ATR structures is unreliable
 for docking}
 
+Both RMSD sanity controls passed for all three ligands before any real pose
+was evaluated: crystal-vs-itself returned exactly $0.000$~{\AA} (naive and
+symmetry-corrected alike), and a deliberately applied, exact $1.0$~{\AA}
+rigid translation was recovered as exactly $1.000$~{\AA} in every case.
+
 Table~\ref{tab:redocking} summarizes the redocking validation across all
-three receptor structures over three independent seeded replicates. 9L4B
-(ATR, camonsertib-bound) and 2YM8 (CHK1) both passed with a substantial
-margin (mean RMSD $0.61\pm0.02$~{\AA} and $0.90\pm0.01$~{\AA}
+three receptor structures over three independent seeded replicates,
+reporting both the naive index-matched RMSD and the symmetry-corrected
+RMSD (spyrmsd \citep{meli2020}). 9L4B (ATR, camonsertib-bound, 3.20~{\AA})
+and 2YM8 (CHK1) both passed with a substantial margin under either metric
+(symmetry-corrected mean RMSD $0.61\pm0.02$~{\AA} and $0.76\pm0.01$~{\AA}
 respectively, well under the 2.0~{\AA} threshold in every replicate). 9L40
-(ATR, berzosertib-bound) failed reproducibly: mean RMSD
-$2.96\pm0.06$~{\AA}, exceeding the threshold in all three replicates. This
-was not simply search noise -- the pairwise RMSD between 9L40's own
-replicate best poses (search reproducibility) was tight ($0.56$~{\AA}
-mean), meaning Vina consistently converged on the same, wrong, pose under
-this box/protocol, rather than failing to converge at all. Per the
-pre-specified rule (Methods), 9L40 was excluded from candidate scoring; the
-pilot library docking below uses 9L4B only.
+(ATR, berzosertib-bound, 2.87~{\AA} -- the \emph{higher}-resolution of the
+two ATR structures) failed reproducibly under both metrics: naive RMSD
+$2.96\pm0.06$~{\AA}, symmetry-corrected $2.53\pm0.01$~{\AA}. Symmetry
+correction narrows the gap -- as expected, since berzosertib has more
+internal topological symmetry than camonsertib or the CHK1 ligand -- but
+does not close it: $2.53$~{\AA} still exceeds the $2.0$~{\AA} threshold by
+a comfortable margin, so the failure is not a symmetry artifact.
+
+This was also not simply search noise, but the relevant comparison is
+relative, not absolute: the pairwise RMSD between 9L40's own replicate best
+poses (search reproducibility, $0.56$~{\AA} mean) is 12$\times$ looser than
+9L4B's ($0.045$~{\AA}) and 7$\times$ looser than 2YM8's ($0.078$~{\AA}).
+Read against the other two structures rather than against the 2.0~{\AA}
+pass threshold, 9L40's search is both less accurate \emph{and} less
+reproducible than the structures that passed -- consistent with a rougher
+or flatter local score landscape in that pocket -- though it is still far
+tighter than the pose-to-pose error itself, meaning Vina is converging on
+a consistent answer, just not the deposited one. Two further checks rule
+out two specific alternative explanations for the 9L40 failure (Methods):
+the box could not have reached the nearby allosteric pocket (60.65~{\AA}
+away, far outside a 22~{\AA} box), and the deposited ligand pose is not an
+obvious modeling outlier by map-model fit (Q-score comparable to 9L4B's,
+though with somewhat lower residue inclusion -- Methods). Per the
+pre-specified rule, 9L40 was excluded from candidate scoring; the pilot
+library docking below uses 9L4B only. Figure~\ref{fig:overlay} shows the
+native and redocked poses for both structures directly. Because the pilot
+library was screened at a lower exhaustiveness (16) than used for
+validation above (32) for compute-cost reasons, we additionally re-ran the
+full redocking validation at exhaustiveness 16 (Methods) to confirm this
+was not a hidden inconsistency: the same pass/fail pattern held exactly --
+9L40 $3.01\pm0.06$~{\AA} (fail), 9L4B $0.59\pm0.02$~{\AA} (pass), 2YM8
+$0.92\pm0.01$~{\AA} (pass) -- so the reliability conclusion is not an
+artifact of the exhaustiveness setting used for validation.
 
 \begin{table}[htbp]
 \centering
-\caption{Redocking validation across three independent seeded Vina replicates (exhaustiveness 32).}
+\caption{Redocking validation across three independent seeded Vina replicates (exhaustiveness 32). Resolution taken directly from each structure's \texttt{\_em\_3d\_reconstruction.resolution} mmCIF field.}
 \label{tab:redocking}
-\begin{tabular}{lccc}
+\small
+\begin{tabular}{lcccccc}
 \toprule
-Structure & Mean RMSD ({\AA}) & Passes $\leq$2.0~{\AA} & Search reproducibility ({\AA}) \\
+Structure & Resolution ({\AA}) & Naive RMSD ({\AA}) & Symm. RMSD ({\AA}) & Passes $\leq$2.0~{\AA} & Search repro. ({\AA}) \\
 \midrule
-9L40 (ATR, VE-822)        & $2.96 \pm 0.06$ & \textbf{No} (all 3 replicates) & $0.56$ \\
-9L4B (ATR, camonsertib)   & $0.61 \pm 0.02$ & Yes (all 3 replicates)         & $0.045$ \\
-2YM8 (CHK1)               & $0.90 \pm 0.01$ & Yes (all 3 replicates)         & $0.078$ \\
+9L40 (ATR, VE-822)      & 2.87 & $2.96 \pm 0.06$ & $2.53 \pm 0.01$ & \textbf{No} (all 3) & $0.56$ \\
+9L4B (ATR, camonsertib) & 3.20 & $0.61 \pm 0.02$ & $0.61 \pm 0.02$ & Yes (all 3)         & $0.045$ \\
+2YM8 (CHK1)             & 2.07 & $0.90 \pm 0.01$ & $0.76 \pm 0.01$ & Yes (all 3)         & $0.078$ \\
 \bottomrule
 \end{tabular}
 \end{table}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{figure_redocking_overlay.png}
+\caption{Native (crystal, grey) vs. redocked (colored) best pose. (A) 9L40/berzosertib: the isopropylsulfonylphenyl and aminomethylphenyl termini are visibly displaced/rotated relative to the native pose (symmetry-corrected RMSD 2.53~{\AA}). (B) 9L4B/camonsertib: near-complete overlay (symmetry-corrected RMSD 0.61~{\AA}).}
+\label{fig:overlay}
+\end{figure}
 
 \subsection*{Seed and derivative library}
 
@@ -290,24 +387,40 @@ Lipinski/Veber/PAINS/Brenk pre-filter. Of the resulting 791 compounds (786
 derivatives + 5 seeds), 680 (86\%) satisfied $\geq$3/4 developability rules
 with no PAINS/Brenk structural alert.
 
-\subsection*{Pilot docking against the validated ATR structure}
+\subsection*{Pipeline sanity-check screen against the validated ATR structure}
+
+This section is a sanity check on the pipeline's behavior, not a
+prospective screening result: as the analysis below shows, its outcome
+(the seed compound outranking its own derivatives) is close to guaranteed
+by construction (see Discussion), and the compound-level ranking should be
+read accordingly.
 
 The 40-compound pilot set (5 seeds + 35 developability-passed derivatives)
-was docked against 9L4B (exhaustiveness 16, three seeded replicates each).
+was docked against 9L4B (exhaustiveness 16, three seeded replicates each;
+Methods discusses the exhaustiveness used for validation vs. screening).
 Best-pose predicted affinity across the set ranged from $-9.80$ to
-$-7.82$~kcal/mol (mean $-8.66\pm0.45$~kcal/mol across all 40 compounds).
-Table~\ref{tab:docking} shows the top 10 ranked compounds. Camonsertib --
-the receptor's own co-crystallized ligand -- ranked first, as expected for
-a structure the receptor was solved with. No BRICS derivative exceeded the
-best seed compound's predicted affinity; the closest, \texttt{deriv\_002}
-($-9.47$~kcal/mol), came within $0.33$~kcal/mol of camonsertib. The three
-top-ranked derivatives (\texttt{deriv\_002}, \texttt{deriv\_003},
-\texttt{deriv\_019}) share camonsertib's oxabicyclic-ether/pyrazolopyrazine
-core with a single substituent varied (methylamino, methoxy, and
-dimethylamino respectively, in place of camonsertib's own morpholine
-substituent) -- an interpretable and expected outcome of BRICS
-recombination re-using the best-scoring seed compound's own fragments in a
-new context, rather than an independent discovery of novel chemical matter.
+$-7.82$~kcal/mol; leading with the more robust statistic, mean affinity
+(across 3 replicates) across all 40 compounds was $-8.66\pm0.45$~kcal/mol.
+Table~\ref{tab:docking} shows the top 10 ranked compounds by mean affinity.
+Camonsertib -- the receptor's own co-crystallized ligand -- ranked first,
+as expected for a structure the receptor was solved with. No BRICS
+derivative exceeded the best seed compound's predicted affinity; the
+closest, \texttt{deriv\_002} ($-9.46\pm0.01$~kcal/mol), came within
+$0.32$~kcal/mol of camonsertib -- a gap well within Vina's reported
+absolute error against experiment (commonly cited at 2--3~kcal/mol), so
+this ranking should be read as indistinguishable rather than as a
+near-miss. The three top-ranked derivatives (\texttt{deriv\_002},
+\texttt{deriv\_003}, \texttt{deriv\_019}) share camonsertib's
+oxabicyclic-ether/pyrazolopyrazine core with a single substituent varied
+(methylamino, methoxy, and dimethylamino respectively, in place of
+camonsertib's own morpholine substituent) -- an interpretable and expected
+outcome of BRICS recombination re-using the best-scoring seed compound's
+own fragments in a new context, rather than an independent discovery of
+novel chemical matter. The 35-derivative subset was selected by rule count
+then molecular weight ascending (Methods), which systematically favors
+smaller ligands -- themselves typically weaker Vina scorers -- so the
+pilot set is, by its own selection rule, stacked against derivatives
+beating the (larger) seed compounds.
 
 \begin{table}[htbp]
 \centering
@@ -338,19 +451,50 @@ The central finding of this pilot is methodological rather than chemical:
 \textbf{a newly deposited, higher-resolution structure is not automatically
 a reliable docking receptor, and only an explicit redocking control
 establishes this, per structure, before any candidate is trusted.} 9L40 and
-9L4B were solved in the same study, at comparable resolution
-\citep{wang2025}, yet only one reproducibly passed a standard accuracy
-control under an otherwise identical protocol. A screening campaign that
-skipped this control and used 9L40 by default (e.g., because it was the
-first hit in a search, or because it captures the more novel allosteric
-site) would have scored every candidate against a receptor conformation the
-docking protocol itself cannot reliably reproduce. Whether the 9L40 failure
-reflects a genuine limitation of rigid-receptor Vina docking against this
-particular conformational state (e.g., an induced-fit effect specific to
-the dimer-interface-engaged assembly) or a more mundane box/protocol
-mismatch is not resolved by this pilot and is worth follow-up, but the
-practical implication for anyone reusing these structures is the same
-either way: validate before you screen.
+9L4B were solved in the same study, yet only one reproducibly passed a
+standard accuracy control under an otherwise identical protocol -- and it
+is the \emph{lower}-resolution structure (9L4B, 3.20~{\AA}) that passed,
+while the higher-resolution one (9L40, 2.87~{\AA}) failed. That inversion
+is, in a single sentence, the practical argument for running this control
+rather than trusting resolution or recency as a proxy for it. A screening
+campaign that skipped this control and used 9L40 by default (e.g., because
+it was the first hit in a search, or because it captures the more novel
+allosteric site) would have scored every candidate against a receptor
+conformation the docking protocol itself cannot reliably reproduce.
+
+We tested, and ruled out, two specific alternative explanations rather than
+leaving the failure as an unresolved binary. It is not a symmetry artifact
+of naive RMSD: symmetry-corrected RMSD (spyrmsd) narrows the gap from
+$2.96$ to $2.53$~{\AA} but 9L40 still fails by a comfortable margin, and the
+same pass/fail pattern is exactly reproduced by the two structures that
+were never in question (9L4B, 2YM8), which rules out a systematic RMSD
+computation error as well. It is not the box reaching into the emptied
+allosteric pocket: that pocket's nearest copy is 60.65~{\AA} from the
+active site, far outside the 22~{\AA} box used here. The remaining
+candidate explanations are a genuinely less well-supported deposited pose
+(partially, not fully, consistent with the wwPDB validation data --
+comparable Q-score but lower residue inclusion than 9L4B) and a genuine
+limitation of rigid-receptor Vina docking against this particular
+conformational state (e.g., an induced-fit effect specific to the
+dimer-interface-engaged assembly). This pilot cannot fully separate those
+two remaining explanations, and does not attempt to; the practical
+implication for anyone reusing these structures is the same either way:
+validate before you screen. What it does establish, with the alternative
+explanations we could cheaply test now closed off, is that the effect is
+real and not an artifact of how it was measured.
+
+This finding rests on a single failing structure out of two tested, and a
+generalizable claim -- that structure-dependent docking reliability is
+common, or that it is unrelated to resolution -- would need a survey across
+many more recently deposited structures, not an anecdote from one. We do
+not make that broader claim here. What this pilot demonstrates is that the
+validate-before-screening control is inexpensive, automatable (the same
+script validated all three structures here), and caught a real,
+non-obvious failure on the very first pair of structures it was pointed
+at; turning that into a rate (what fraction of recent cryo-EM kinase
+depositions pass a standard redocking control, and does failure correlate
+with resolution, deposition year, or map-quality metrics) is the natural
+next study, using the same pipeline at a larger n.
 
 The pilot docking result is, appropriately for a 35-derivative pilot,
 modest rather than dramatic: no generated derivative exceeded the predicted
@@ -375,43 +519,66 @@ compounds is an open question this pilot's scale cannot answer.
 
 This is a small pilot, and its scope was set by what could be executed
 directly and verifiably, not by what would be most impressive to report.
-Specifically: (1) the BRICS recombination cap (5,000) is combinatorial, not
-principled, and a larger or differently seeded run would sample a
-different, likely larger, region of the accessible chemical space; (2) the
-40-compound pilot library is a small, deterministic subset of the
-developability-passed derivatives (ranked by rule count then molecular
-weight), not a comprehensive screen, and enrichment-style retrieval
-statistics (ROC-AUC, enrichment factor) are not meaningful at this scale and
-are not reported; (3) no molecular dynamics or MM-GBSA relative energetic
-estimation was run -- both require substantially more compute (GPU
-acceleration for MD at any informative timescale) than was available, and
-docking scores alone are known to correlate imperfectly with binding
-affinity; (4) no cross-kinase selectivity panel was run -- this would
-require additional receptor structures, each independently redocking-validated
-by the same standard applied to the three structures here, which was beyond
-this pilot's scope; (5) as throughout, nothing here establishes ATR/CHK1
-functional modulation, inhibition, or activation -- only predicted binding
-and ranking; (6) the seed and reference SMILES for prexasertib and
-ceralasertib were obtained via web search rather than a structured chemical
-database query (PubChem/ChEMBL were not reachable) and, while independently
-verified against reported molecular formula and exact mass, should be
-re-confirmed against a primary chemical database before further use.
+Specifically: (1) the central reliability finding rests on \textbf{n=1}
+failing structure out of two tested; it demonstrates that the
+validate-before-screening control is necessary and can catch a real,
+non-obvious failure, but a claim about how \emph{common} such failures are,
+or what they correlate with, would need a survey across many more
+structures (Discussion) and is not made here; (2) the BRICS recombination
+cap (5,000) is combinatorial, not principled, and a larger or differently
+seeded run would sample a different, likely larger, region of the
+accessible chemical space; (3) the 40-compound pilot library is a small,
+deterministic subset of the developability-passed derivatives (ranked by
+rule count then molecular weight -- a rule that, incidentally, is stacked
+against derivatives outscoring the larger seed compounds), not a
+comprehensive screen, and enrichment-style retrieval statistics (ROC-AUC,
+enrichment factor) are not meaningful at this scale and are not reported;
+(4) no molecular dynamics or MM-GBSA relative energetic estimation was run
+-- both require substantially more compute (GPU acceleration for MD at any
+informative timescale) than was available, and docking scores alone are
+known to correlate imperfectly with binding affinity; (5) no cross-kinase
+selectivity panel was run -- this would require additional receptor
+structures, each independently redocking-validated by the same standard
+applied to the three structures here, which was beyond this pilot's scope;
+(6) as throughout, nothing here establishes ATR/CHK1 functional modulation,
+inhibition, or activation -- only predicted binding and ranking; (7) the
+seed and reference SMILES for prexasertib and ceralasertib were obtained
+via web search rather than a structured chemical database query
+(PubChem/ChEMBL were not reachable) and, while independently verified
+against reported molecular formula and exact mass, should be re-confirmed
+against a primary chemical database before further use.
 
 \section*{Conclusions}
 
 Redocking validation -- not resolution, recency, or biological interest --
 is what determines whether a deposited structure is a trustworthy docking
-receptor. Applied to two contemporaneous, comparable-resolution ATR
-structures, this control passed one and failed the other, a distinction
-that would not have been visible without running it. Screened against the
-validated structure, a small BRICS-derived pilot library reproduced the
-expected top rank of the receptor's own native ligand and generated
-interpretable, if modest, analogs of it, without yet surfacing a chemotype
-that improves on the seed compounds -- a realistic, honestly reported
-outcome for a pilot of this scale, and one further reason to treat larger
-claims from similarly small screens with caution. All structures, code, and
-intermediate data used in this study are openly available for independent
-verification and reuse.
+receptor. Applied to two contemporaneous ATR structures from the same
+study, this control passed the lower-resolution one and failed the
+higher-resolution one, a distinction that would not have been visible
+without running it, that survives symmetry-corrected RMSD, and that is not
+explained by the box reaching an emptied allosteric site. Screened against
+the validated structure, a small BRICS-derived sanity-check library
+reproduced the expected top rank of the receptor's own native ligand and
+generated interpretable, if modest, analogs of it, without yet surfacing a
+chemotype that improves on the seed compounds -- a realistic, honestly
+reported outcome for a pilot of this scale, and one further reason to treat
+larger claims from similarly small screens with caution. The natural next
+step is the same pipeline at a larger n: a survey of redocking pass rates
+across recently deposited structures would turn this single, real finding
+into a rate. All structures, code, and intermediate data used in this
+study are openly available for independent verification and reuse.
+
+\section*{Declaration of AI assistance}
+Portions of this study's code, analysis, and manuscript drafting were
+produced with the assistance of an AI coding assistant (Claude, Anthropic),
+operating under direct human review and direction throughout, including
+the verification steps described in Methods (e.g., cross-checking
+externally sourced facts against primary sources such as mmCIF structure
+files, wwPDB validation reports, and independently reported molecular
+formulae before use). All computational results reported are from actual
+executed code, not AI-generated approximations; all data-processing and
+analysis code is available at the repository in Availability of data and
+materials for independent verification.
 
 \section*{Availability of data and materials}
 All code, the seed and derivative compound tables, redocking validation
