@@ -17,14 +17,27 @@ and CHK1 Ligands for Replication-Stress Research."*
 
 Start here:
 
-- **[`manuscript/draft_v1.md`](manuscript/draft_v1.md)** — first manuscript
-  draft (Revision 2). Introduction, Methods, and the results-independent parts
-  of the Discussion are written in full; every place a number or figure would
-  go is an explicit `[PENDING: <script>]` marker, not an invented value — this
-  sandboxed environment has no egress to PubChem/ChEMBL/UCSC/RCSB and no
-  Vina/OpenMM/AmberTools installation, so no stage of the pipeline could
-  actually be run here. Fill in `[PENDING]` markers only by running the named
-  script, never by hand.
+- **[`manuscript/submission/paper.pdf`](manuscript/submission/paper.pdf)** —
+  a real, fully executed, submittable pilot paper (LaTeX source in the same
+  folder). A later session found that this "sandboxed" environment actually
+  has pip access to PyPI (real `vina`, `openmm`, `openbabel-wheel` install
+  from there), read access to the RCSB PDB's AWS Open Data mirror
+  (`s3://pdbsnapshots`, reachable even though `rcsb.org` is not), and apt
+  access (a full LaTeX toolchain installs cleanly) — so this paper's central
+  finding is real, not a placeholder: **a redocking validation control
+  reproducibly passed one 2025 ATR structure (9L4B) and failed another
+  (9L40) solved in the same study**, and a 40-compound BRICS-derived pilot
+  library was actually docked against the validated structure. Scope is
+  deliberately much narrower than the full pipeline below (single target,
+  no MD/MM-GBSA — no GPU available — no kinome panel); see
+  `data/pilot_run_v1/README.md` for the real data behind every number in it.
+- **[`manuscript/draft_v1.md`](manuscript/draft_v1.md)** — the earlier,
+  fully-`[PENDING]` draft against the *original*, larger-scope pipeline
+  below, written when PubChem/ChEMBL/UCSC/RCSB and Vina/OpenMM/AmberTools
+  really were unreachable in that session. Superseded as the "submittable"
+  artifact by the real pilot paper above, but still the right reference for
+  the full multi-target pipeline's intended design once more compute/access
+  is available.
 - **[`docs/05_review_response_round2.md`](docs/05_review_response_round2.md)**
   — response to a second external review, of the manuscript draft itself.
   Several structural-biology and benchmarking-literature claims in that review

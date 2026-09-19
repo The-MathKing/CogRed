@@ -1,0 +1,6 @@
+name,target,smiles,standardized_smiles
+berzosertib_VE822,ATR,CNCc1ccc(-c2cc(-c3nc(-c4ccc(S(=O)(=O)C(C)C)cc4)cnc3N)on2)cc1,CNCc1ccc(-c2cc(-c3nc(-c4ccc(S(=O)(=O)C(C)C)cc4)cnc3N)on2)cc1
+camonsertib_RP3500,ATR,C[C@@H]1COCCN1c1cc([C@]2(O)C[C@H]3CC[C@@H](C2)O3)c2cnn(C3=NN=CC3)c2n1,C[C@@H]1COCCN1c1cc([C@]2(O)C[C@H]3CC[C@@H](C2)O3)c2cnn(C3=NN=CC3)c2n1
+CHK1_inhibitor_YM8,CHK1,C[C@H](CN(C)C)OC1=N/C(=N\C2=NCc3c(Cl)cccc3C2)C=N[C@H]1C#N,C[C@H](CN(C)C)OC1=N/C(=N\C2=NCc3c(Cl)cccc3C2)C=N[C@H]1C#N
+prexasertib,CHK1,COc1cccc(OCCCN)c1-c1cc(Nc2cnc(C#N)cn2)n[nH]1,COc1cccc(OCCCN)c1-c1cc(Nc2cnc(C#N)cn2)n[nH]1
+ceralasertib,ATR,C[C@@H]1COCCN1c1cc(C2([S@](C)(=N)=O)CC2)nc(-c2cncc3[nH]ccc23)n1,C[C@@H]1COCCN1c1cc(C2([S@](C)(=N)=O)CC2)nc(-c2cncc3[nH]ccc23)n1
