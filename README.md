@@ -17,6 +17,14 @@ and CHK1 Ligands for Replication-Stress Research."*
 
 Start here:
 
+- **[`manuscript/draft_v1.md`](manuscript/draft_v1.md)** — first manuscript
+  draft. Introduction, Methods, and the results-independent parts of the
+  Discussion are written in full; every place a number or figure would go is
+  an explicit `[PENDING: <script>]` marker, not an invented value — this
+  sandboxed environment has no egress to PubChem/ChEMBL/UCSC/RCSB and no
+  Vina/OpenMM/AmberTools installation, so no stage of the pipeline could
+  actually be run here. Fill in `[PENDING]` markers only by running the named
+  script, never by hand.
 - **[`docs/04_review_response.md`](docs/04_review_response.md)** — response to
   external review (Round 1): what was accepted, what was contested, and every
   change it forced. **Read this first** — it explains why the project's central
