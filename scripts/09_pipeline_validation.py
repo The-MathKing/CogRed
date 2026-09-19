@@ -105,13 +105,20 @@ class LeakageReport:
 
 
 def audit_leakage(seed_smiles: list[str], evaluation_smiles: list[str],
-                  tanimoto_threshold: float = 0.7) -> LeakageReport:
+                  tanimoto_threshold: float = 0.4) -> LeakageReport:
     """Quantify how close the evaluation set is to the seed/derivative chemistry.
 
     Reports scaffold collisions and nearest-neighbour Tanimoto similarity of
     every evaluation compound to its closest seed compound. These numbers
     belong in the manuscript Results, not in Supporting Information -- they
     are what tells a reader whether the retrieval metrics mean anything.
+
+    Default threshold lowered from an earlier 0.7 to 0.4 after external review:
+    an audit of the comparable LIT-PCBA benchmark found scaffold-split alone
+    left hundreds of train/evaluation analog pairs at Tanimoto >= 0.6 uncaught
+    (see manuscript references), so 0.7 was too permissive to catch the
+    leakage scaffold-splitting is known to miss. This function only reports;
+    `exclude_leaked_compounds` below performs the actual exclusion.
     """
     seed_scaffolds = {murcko_scaffold(s) for s in seed_smiles} - {None}
     seed_fps = [fp for fp in (_fingerprint(s) for s in seed_smiles) if fp]
@@ -134,6 +141,28 @@ def audit_leakage(seed_smiles: list[str], evaluation_smiles: list[str],
         n_above_threshold=int(np.nansum(sims >= tanimoto_threshold)),
         threshold=tanimoto_threshold,
     )
+
+
+def exclude_leaked_compounds(seed_smiles: list[str], evaluation_smiles: list[str],
+                              tanimoto_threshold: float = 0.4) -> tuple[list[str], LeakageReport]:
+    """Actually remove evaluation compounds too similar to the seed set,
+    rather than only reporting them (manuscript §2.5: 'not merely flagged').
+
+    Returns the filtered evaluation list plus the LeakageReport computed
+    BEFORE filtering, so the number excluded is visible in the manuscript.
+    """
+    report = audit_leakage(seed_smiles, evaluation_smiles, tanimoto_threshold)
+    seed_fps = [fp for fp in (_fingerprint(s) for s in seed_smiles) if fp]
+
+    kept = []
+    for smi in evaluation_smiles:
+        fp = _fingerprint(smi)
+        if fp is None or not seed_fps:
+            continue
+        nn_sim = max(DataStructs.BulkTanimotoSimilarity(fp, seed_fps))
+        if nn_sim < tanimoto_threshold:
+            kept.append(smi)
+    return kept, report
 
 
 # --------------------------------------------------------------------------
@@ -170,6 +199,33 @@ def generate_property_matched_decoys(actives_smiles: list[str], decoy_pool_smile
         rng.shuffle(candidates)
         decoys.update(candidates[:n_decoys_per_active])
     return sorted(decoys)
+
+
+def compare_decoy_standards(results_dude_decoys: pd.DataFrame,
+                             results_secondary_decoys: pd.DataFrame,
+                             score_col: str = "full_pipeline_score",
+                             label_col: str = "is_active") -> dict:
+    """Cross-check retrieval metrics under two different decoy standards
+    (manuscript §2.5, §4.3): DUD-E-style property-matched decoys have
+    documented, exploitable biases, so a result reported against them alone
+    is not by itself trustworthy. `results_secondary_decoys` should use an
+    experimentally-confirmed inactive set and/or DeepCoy-generated decoys
+    (Imrie et al., 2021 -- generating those decoys requires the external
+    DeepCoy model/repository, not reproduced here) built on the SAME actives.
+
+    A large gap between the two is itself the finding to report, not a
+    reason to keep only the more favorable number.
+    """
+    metrics_dude = compute_metrics(results_dude_decoys[score_col].to_numpy(),
+                                    results_dude_decoys[label_col].to_numpy())
+    metrics_secondary = compute_metrics(results_secondary_decoys[score_col].to_numpy(),
+                                         results_secondary_decoys[label_col].to_numpy())
+    return {
+        "dude_style": metrics_dude,
+        "secondary_decoys": metrics_secondary,
+        "roc_auc_gap": metrics_dude["roc_auc"] - metrics_secondary["roc_auc"],
+        "pr_auc_gap": metrics_dude["pr_auc"] - metrics_secondary["pr_auc"],
+    }
 
 
 # --------------------------------------------------------------------------
@@ -281,8 +337,10 @@ if __name__ == "__main__":
     actives = pd.read_csv("data/chembl_actives.csv")["standardized_smiles"].dropna().tolist()
 
     train_actives, test_actives = scaffold_split(actives)
-    leakage = audit_leakage(seed_compounds, test_actives)
-    print("Leakage audit:", leakage.as_dict())
+    test_actives, leakage = exclude_leaked_compounds(seed_compounds, test_actives)
+    print("Leakage audit (pre-exclusion counts):", leakage.as_dict())
+    print(f"{leakage.n_evaluated - len(test_actives)}/{leakage.n_evaluated} evaluation "
+          f"compounds excluded at Tanimoto >= {leakage.threshold} to seed chemistry.")
 
     comparison = compare_methods(results)
     print(comparison)

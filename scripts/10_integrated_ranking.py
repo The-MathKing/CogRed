@@ -23,7 +23,7 @@ Two defenses, both implemented here:
      table -- it is the number that tells a reader whether the ranking means
      anything.
 
-Note on correlated objectives: docking score, MM-PBSA estimate, and MD
+Note on correlated objectives: docking score, MM-GBSA estimate, and MD
 stability are not independent evidence dimensions -- they share force-field
 and pose assumptions. `objective_correlation_matrix` reports their empirical
 correlation so the manuscript can state this rather than implying four
@@ -115,7 +115,7 @@ def weight_sensitivity_analysis(normalized: pd.DataFrame,
 def objective_correlation_matrix(normalized: pd.DataFrame) -> pd.DataFrame:
     """Spearman correlation between objectives.
 
-    High correlation between docking score, MM-PBSA estimate, and MD stability
+    High correlation between docking score, MM-GBSA estimate, and MD stability
     means they are not independent lines of evidence. State this in Discussion
     rather than presenting them as mutual confirmation.
     """

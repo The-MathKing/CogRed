@@ -1,11 +1,17 @@
 """
-MM-PBSA RELATIVE ENERGETIC ESTIMATION on top of the OpenMM MD trajectories
+MM-GBSA RELATIVE ENERGETIC ESTIMATION on top of the OpenMM MD trajectories
 produced by `06_md_simulation_setup.py` (manuscript Methods 2.8).
 
-Terminology, per external review: the values produced here are end-state
-MM-GBSA/MM-PBSA estimates used for RELATIVE RANKING of ligand-associated
-energetics. They are not binding free energies and must never be reported as
-ΔG, as affinities, or in a figure axis labelled ΔG. A value of, say,
+Naming, fixed after external review round 2 (manuscript §2.8): the method
+actually configured below (`&gb` block, `igb=5`) is MM-GBSA (Generalized
+Born), not MM-PBSA (Poisson-Boltzmann). An earlier version of this docstring
+used the two terms interchangeably, which is exactly the inconsistency a
+computational-chemistry reviewer will catch fastest. `MMPBSA.py` remains the
+correct name of the AmberTools *program* used below regardless of which
+implicit-solvent model it is configured to run -- that is the program's own
+name, not a description of the method. Every value produced here is used for
+RELATIVE RANKING of ligand-associated energetics, never as a binding free
+energy, an affinity, or a figure axis labelled ΔG. A value of, say,
 -48 kcal/mol is not an experimentally meaningful affinity; it is a
 model-dependent number whose usefulness is confined to ordering compounds
 computed under identical settings.
@@ -14,18 +20,22 @@ Report alongside every value: frames used, frame correlation, dielectric
 assumptions, entropy treatment, error estimation, and sensitivity to the
 chosen trajectory window (`assess_window_sensitivity` below).
 
-OpenMM has no native MM-PBSA implementation, and AmberTools' `MMPBSA.py`
-remains the most widely cited, reviewer-recognized implementation, so this
-script converts the OpenMM system/trajectory to Amber topology/coordinate
+OpenMM has no native MM-GBSA implementation, and AmberTools' `MMPBSA.py`
+remains the most widely cited, reviewer-recognized implementation of it, so
+this script converts the OpenMM system/trajectory to Amber topology/coordinate
 format via ParmEd, then drives `MMPBSA.py` as a subprocess and parses its
 output. This requires AmberTools installed (`ambertools` conda package,
 open-source/BSD, no separate MD engine required -- MMPBSA.py is used purely
-as a post-processing tool here, the MD itself stays 100% OpenMM).
+as a post-processing tool here, the MD itself stays 100% OpenMM). If the
+ParmEd conversion from an OpenMM/OpenFF system proves unreliable in practice
+-- a known friction point for this specific toolchain combination --
+`gmx_MMPBSA` is the fallback path.
 
-Entropy is neglected by default (interaction/MM-PBSA without normal-mode or
-quasi-harmonic entropy) -- state this explicitly in Methods 2.8 as done here,
-per the critique doc's reproducibility checklist. Add `--entropy nmode` to
-the MMPBSA.py call if compute allows and cite the added assumption.
+Entropy is neglected by default (single-trajectory MM-GBSA without
+normal-mode or quasi-harmonic entropy) -- state this explicitly in Methods
+2.8 as done here, per the critique doc's reproducibility checklist. Add
+`--entropy nmode` to the MMPBSA.py call if compute allows and cite the added
+assumption.
 """
 from __future__ import annotations
 
@@ -122,7 +132,7 @@ def parse_mmpbsa_results(results_dat: Path) -> dict:
 
 
 def batch_mmpbsa(compound_dirs: list[Path]) -> pd.DataFrame:
-    """Run MM-PBSA over every shortlisted compound's MD output directory.
+    """Run MM-GBSA over every shortlisted compound's MD output directory.
 
     Each `compound_dir` is expected to already contain complex/receptor/ligand
     prmtop files (from `convert_openmm_to_amber`) and `production.dcd` (from

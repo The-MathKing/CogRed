@@ -17,7 +17,7 @@ Protocol (stated explicitly so it can be copied into Methods 2.7):
      (Monte Carlo barostat, 1 atm).
   6. Production run (default: 100 ns; scale down and state the change if
      compute-constrained -- see critique doc Section 6, item 4).
-  7. Save trajectory (DCD) + checkpoint for MM-PBSA post-processing.
+  7. Save trajectory (DCD) + checkpoint for MM-GBSA post-processing.
 """
 from __future__ import annotations
 

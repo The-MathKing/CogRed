@@ -27,6 +27,28 @@ Two corrections from the previous version:
      Science 2017) and reports whether the predicted ordering recovers the
      experimental one. If it does not, the heatmap in Figure 6 should not be
      interpreted quantitatively -- say so in the manuscript.
+
+Two further corrections (external review round 2, manuscript §2.9):
+
+  4. PKA MISCLASSIFICATION. An earlier version of this module called PKA a
+     "structurally distant negative control." That is wrong: CHK1 belongs to
+     the CAMK group of the human kinome and PKA is the AGC-group archetype of
+     the SAME bilobal eukaryotic protein kinase fold (Manning et al., Science
+     2002). PKA is a near neighbour of CHK1 by fold, not a distant one. It is
+     kept in the panel as a FOLD COMPARATOR (does a candidate's selectivity
+     liability track fold similarity rather than target identity?), and
+     `DISTANT_CONTROL` below adds a genuinely fold-unrelated ATP-binding
+     protein so the panel actually has the negative control it claimed to
+     have.
+
+  5. REFERENCE-SET SIZE. Three reference compounds cannot produce an
+     interpretable Spearman correlation -- its confidence interval spans most
+     of [-1, 1]. `REFERENCE_COMPOUNDS` is now sized to require the caller to
+     supply 20-50 compounds drawn from Davis et al. (2011) / Klaeger et al.
+     (2017) before `benchmark_against_reference_profiles` is treated as
+     validation rather than illustration; the three-compound dict below is
+     kept only as a placeholder/smoke-test and `MIN_REFERENCE_COMPOUNDS`
+     enforces this at call time.
 """
 from __future__ import annotations
 
@@ -49,11 +71,26 @@ OFFTARGET_PANEL = {
     "CDK2": "1HCK",
     "WEE1": "5V5V",
     "PLK1": "2OWB",
-    "PKA": "1ATP",  # distant-fold control
+    "PKA": "1ATP",  # AGC-group FOLD COMPARATOR to CHK1 (CAMK group), not a
+                    # distant negative control -- see module docstring item 4.
+}
+
+# A genuinely fold-distant ATP-binding protein, to supply the negative
+# control PKA does not provide. [PENDING: pick and verify a specific PDB ID
+# and confirm the fold classification before running -- not yet selected.]
+DISTANT_CONTROL: dict[str, str] = {
+    # e.g. "Hsp90": "<PDB ID>"  -- an ATP-binding chaperone with no
+    # relationship to the protein kinase fold, unlike every entry above.
 }
 
 # Reference compounds with published experimental kinome selectivity profiles,
-# used to test whether the predicted metric tracks reality at all.
+# used to test whether the predicted metric tracks reality at all. This
+# three-compound dict is a placeholder/smoke-test only -- see item 5 above.
+# Before treating `benchmark_against_reference_profiles` as validation
+# (rather than illustration), expand to 20-50 compounds drawn from Davis et
+# al. (2011) / Klaeger et al. (2017).
+MIN_REFERENCE_COMPOUNDS = 20
+
 REFERENCE_COMPOUNDS = {
     "staurosporine": "broadly promiscuous",
     "berzosertib": "ATR-selective",
@@ -153,7 +190,8 @@ def compute_selectivity_scores(normalized: pd.DataFrame, primary_target: str) ->
 
 
 def benchmark_against_reference_profiles(normalized: pd.DataFrame,
-                                          experimental_ranks: dict[str, dict[str, float]]) -> dict:
+                                          experimental_ranks: dict[str, dict[str, float]],
+                                          require_min_compounds: bool = True) -> dict:
     """Does the predicted selectivity ordering recover experimental kinome data?
 
     `experimental_ranks`: {compound: {kinase: experimental_affinity_or_rank}}
@@ -161,7 +199,20 @@ def benchmark_against_reference_profiles(normalized: pd.DataFrame,
     correlation per reference compound. Weak or negative correlation means the
     predicted heatmap must not be read quantitatively -- report that outcome
     rather than dropping the benchmark.
+
+    `require_min_compounds`: with fewer than MIN_REFERENCE_COMPOUNDS reference
+    compounds, any correlation computed is not interpretable as validation
+    (its CI spans most of [-1, 1]) -- by default this raises rather than
+    silently returning a number that looks like validation but isn't. Pass
+    False only to run an explicitly-labelled illustrative smoke test.
     """
+    if require_min_compounds and len(experimental_ranks) < MIN_REFERENCE_COMPOUNDS:
+        raise ValueError(
+            f"Only {len(experimental_ranks)} reference compounds supplied; "
+            f"need >= {MIN_REFERENCE_COMPOUNDS} for an interpretable "
+            f"correlation (manuscript §2.9). Pass require_min_compounds=False "
+            f"to run anyway as an explicitly illustrative-only smoke test."
+        )
     out = {}
     for compound, exp_profile in experimental_ranks.items():
         pred = normalized[normalized["smiles"] == compound].set_index("kinase")["z_score"]

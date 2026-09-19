@@ -12,6 +12,15 @@ Reproducibility note (critique doc Section 5): this script logs the exact
 Vina version, seed, and exhaustiveness used for every run into the results
 CSV so the manuscript's methods table can be generated directly from
 `data/docking_results.csv` instead of re-typed by hand.
+
+Docking VALIDATION (added after external review round 2, manuscript §2.4):
+`redock_native_ligand` extracts a receptor's own co-crystallized ligand and
+docks it back into that receptor under the identical protocol, reporting the
+RMSD to the native pose. This is a different question from replicate
+agreement across seeds (does the search reproduce its own answer) -- redocking
+answers whether the answer is *correct*. A receptor/box combination that
+fails the pre-specified RMSD threshold should not be trusted for candidate
+scoring; see manuscript §2.4 and §4.3 (Limitations).
 """
 from __future__ import annotations
 
@@ -21,9 +30,13 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import AllChem
 
 VINA_BIN = "vina"
 OBABEL_BIN = "obabel"
+DEFAULT_EXHAUSTIVENESS = 32  # Vina's own default (8) is too low for a result
+                              # reported as a reproducible benchmark score.
 
 
 @dataclass
@@ -64,8 +77,8 @@ def receptor_pdb_to_pdbqt(receptor_pdb: Path, out_path: Path) -> Path:
 
 
 def run_vina(receptor_pdbqt: Path, ligand_pdbqt: Path, box: DockingBox,
-             out_dir: Path, exhaustiveness: int = 16, num_modes: int = 9,
-             seed: int = 42) -> dict:
+             out_dir: Path, exhaustiveness: int = DEFAULT_EXHAUSTIVENESS,
+             num_modes: int = 9, seed: int = 42) -> dict:
     out_dir.mkdir(parents=True, exist_ok=True)
     out_pdbqt = out_dir / f"{ligand_pdbqt.stem}_docked.pdbqt"
     log_path = out_dir / f"{ligand_pdbqt.stem}_vina.log"
@@ -96,6 +109,85 @@ def run_vina(receptor_pdbqt: Path, ligand_pdbqt: Path, box: DockingBox,
         "seed": seed,
         "vina_version": get_vina_version(),
         "docked_pose_path": str(out_pdbqt),
+    }
+
+
+def extract_cocrystal_ligand(receptor_pdb: Path, ligand_resname: str,
+                              out_sdf: Path) -> Path:
+    """Pull one HETATM residue (the co-crystallized ligand) out of a receptor
+    PDB and write it as SDF. `ligand_resname` is the 3-letter PDB ligand code
+    (e.g. the code for VE-822/berzosertib in PDB 9L40) -- look this up in the
+    structure's PDB header before calling.
+
+    Residue selection uses Biopython (bond orders are not reliable from raw
+    PDB coordinates alone, so this is a starting geometry for redocking, not
+    a substitute for the deposited chemical-component SDF/SMILES when RCSB
+    provides one -- prefer that when available and fall back to this only
+    when it is not).
+    """
+    from Bio.PDB import PDBIO, PDBParser, Select
+
+    class _LigandSelect(Select):
+        def accept_residue(self, residue):
+            return residue.get_resname() == ligand_resname
+
+    structure = PDBParser(QUIET=True).get_structure("receptor", str(receptor_pdb))
+    tmp_pdb = out_sdf.with_suffix(".ligand.pdb")
+    io = PDBIO()
+    io.set_structure(structure)
+    io.save(str(tmp_pdb), _LigandSelect())
+
+    subprocess.run([OBABEL_BIN, str(tmp_pdb), "-O", str(out_sdf)],
+                    check=True, capture_output=True)
+    return out_sdf
+
+
+def redock_native_ligand(receptor_pdb: Path, native_ligand_sdf: Path,
+                          box: DockingBox, out_dir: Path,
+                          rmsd_pass_threshold: float = 2.0,
+                          exhaustiveness: int = DEFAULT_EXHAUSTIVENESS,
+                          seed: int = 1) -> dict:
+    """Redocking control (manuscript §2.4): dock a receptor's own
+    co-crystallized ligand back into itself and report heavy-atom RMSD to the
+    native pose against a pre-specified pass threshold.
+
+    This is the accuracy check that replicate-seed agreement (`run_vina`
+    called multiple times) cannot provide -- replicates only show the search
+    is reproducible, not that the pose is correct.
+    """
+    out_dir.mkdir(parents=True, exist_ok=True)
+    receptor_pdbqt = receptor_pdb_to_pdbqt(receptor_pdb, out_dir / "receptor.pdbqt")
+
+    native_mol = Chem.SDMolSupplier(str(native_ligand_sdf), removeHs=False)[0]
+    if native_mol is None:
+        raise ValueError(f"Could not parse native ligand from {native_ligand_sdf}")
+    native_smiles = Chem.MolToSmiles(Chem.RemoveHs(native_mol))
+
+    ligand_pdbqt = smiles_to_pdbqt(native_smiles, out_dir / "native_ligand.pdbqt")
+    docked = run_vina(receptor_pdbqt, ligand_pdbqt, box, out_dir / "redock_poses",
+                       exhaustiveness=exhaustiveness, seed=seed)
+
+    docked_sdf = out_dir / "redocked_best_pose.sdf"
+    subprocess.run(
+        [OBABEL_BIN, docked["docked_pose_path"], "-O", str(docked_sdf), "-f", "1", "-l", "1"],
+        check=True, capture_output=True,
+    )
+    docked_mol = Chem.SDMolSupplier(str(docked_sdf), removeHs=False)[0]
+
+    rmsd = float("nan")
+    if docked_mol is not None:
+        try:
+            rmsd = AllChem.GetBestRMS(Chem.RemoveHs(docked_mol), Chem.RemoveHs(native_mol))
+        except (RuntimeError, ValueError):
+            rmsd = float("nan")  # atom-ordering/connectivity mismatch; inspect manually
+
+    return {
+        "receptor": receptor_pdb.stem,
+        "redocking_rmsd_angstrom": rmsd,
+        "pass_threshold_angstrom": rmsd_pass_threshold,
+        "passes_validation": bool(rmsd <= rmsd_pass_threshold) if rmsd == rmsd else False,
+        "vina_version": docked["vina_version"],
+        "exhaustiveness": exhaustiveness,
     }
 
 
@@ -135,7 +227,30 @@ if __name__ == "__main__":
     # Example call -- coordinates below are placeholders; derive the real box
     # from the co-crystallized ligand centroid of the chosen PDB structure
     # (e.g., via `obabel` centroid calc or a quick RDKit/Biopython script).
+    # ATR default receptor per manuscript §2.1: PDB 9L40 (VE-822-bound kinase
+    # domain, ~2.9 A) or 9L4B (RP-3500-bound) -- NOT 5YZ0 (4.7 A, unsuitable
+    # for docking). CHK1 receptor PDB ID: [PENDING, see manuscript §2.1].
     box = DockingBox(center_x=0.0, center_y=0.0, center_z=0.0)
+
+    # Validation MUST run before any candidate is scored (manuscript §2.4).
+    ligand_sdf = extract_cocrystal_ligand(
+        Path("data/receptors/CHK1.pdb"), ligand_resname="LIG",  # [PENDING: real 3-letter code]
+        out_sdf=Path("data/receptors/CHK1_native_ligand.sdf"),
+    )
+    redock_result = redock_native_ligand(
+        receptor_pdb=Path("data/receptors/CHK1.pdb"),
+        native_ligand_sdf=ligand_sdf,
+        box=box,
+        out_dir=Path("data/docking/CHK1_validation"),
+    )
+    print("Redocking validation:", redock_result)
+    if not redock_result["passes_validation"]:
+        raise SystemExit(
+            "Redocking RMSD exceeds the pre-specified threshold -- this "
+            "receptor/box combination should not be used for candidate "
+            "scoring without an explicit stated reason (manuscript §2.4)."
+        )
+
     results, summary = dock_library(
         compound_csv="data/developability_passed_compounds.csv",
         receptor_pdb="data/receptors/CHK1.pdb",
