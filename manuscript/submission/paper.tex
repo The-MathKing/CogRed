@@ -14,7 +14,7 @@
 
 \setstretch{1.08}
 
-\title{\Large Redocking Validation Reveals Structure-Dependent Docking Reliability in ATR: A Reproducible Pilot Virtual Screen of BRICS-Generated Candidates}
+\title{\Large Redocking Failure Is Common Across Recent Kinase Structures and Is Not Predicted by Map-Quality Metrics: A Validated Survey of ATR/CHK1 and CDK-Activating Kinase}
 
 \author{[Author name(s) to be added]\\[2pt]
 \small [Affiliation to be added]\\[2pt]
@@ -75,8 +75,9 @@ across three seeds, versus $4.50\pm0.05$~{\AA} in a matched rigid control
 (same enlarged box and receptor preparation, no flexible residues) --
 better, but no seed passed the $2.0$~{\AA} threshold. Docking the same 40-compound pilot set against the excluded 9L40
 structure instead of the validated 9L4B produced a substantially different
-ranking (Spearman $\rho=0.19$, $p=0.24$ between the two receptors' scores;
-only 5/10 compounds shared between the two top-10 lists), demonstrating
+ranking, confirmed under a matched three-seed-per-receptor design
+(Spearman $\rho=0.21$, $p=0.19$ between the two receptors' scores; only
+5/10 compounds shared between the two top-10 lists), demonstrating
 concretely what is lost by skipping the validation step. Because the CAK
 failure rate is far below AutoDock Vina's documented self-docking success
 rate on curated benchmarks (58\% on the 285-complex PDBbind Core Set), the
@@ -769,33 +770,41 @@ Literature Vina baseline \citep{zhang2023} & 285 & -- & 58\% \\
 screen}
 
 Docking the same 40-compound pilot set against 9L40 instead of 9L4B
-produced a materially different ranking: the Spearman rank correlation
-between the two receptors' scores across all 40 compounds is $\rho=0.19$
-($p=0.24$, not significant), and only 5 of the top-10 compounds by 9L4B
-score also appear in 9L40's top-10 (Table~\ref{tab:errorprop}). The mean
-absolute rank shift between the two receptors is 12.3 positions (out of
-40), with a maximum shift of 29 positions (\texttt{deriv\_022}: rank 7 by
-9L4B, rank 36 by 9L40). This is not a claim that 9L40's scores are
-``wrong'' in some absolute sense -- both are Vina scores against real,
-deposited coordinates -- but a direct demonstration that had the
-validation step been skipped and 9L40 used by default, the pilot screen
-would have prioritized a substantially different, and on the evidence
-above less trustworthy, set of compounds.
+produced a materially different ranking. This comparison was first run
+with one seed for 9L40 against the existing three-seed-averaged 9L4B
+ranking -- an asymmetric design that could depress the correlation on its
+own, independent of any real receptor difference -- so it was re-run with
+the same three seeds (2000, 2001, 2002) used for 9L4B, for a matched
+comparison (Methods). The matched result is materially the same as the
+original: Spearman rank correlation between the two receptors' best-of-3
+scores across all 40 compounds is $\rho=0.21$ ($p=0.19$, not
+significant; one-seed comparison: $\rho=0.19$, $p=0.24$), and 5 of the
+top-10 compounds by 9L4B score also appear in 9L40's top-10 under either
+design (Table~\ref{tab:errorprop}). The mean absolute rank shift between
+the two receptors is 11.7 positions (out of 40, matched design), with a
+maximum shift of 29 positions. The one-seed-vs-three-seed asymmetry was a
+valid design concern to check, but correcting it did not change the
+conclusion. This is not a claim that 9L40's scores are ``wrong'' in some
+absolute sense -- both are Vina scores against real, deposited
+coordinates -- but a direct demonstration that had the validation step
+been skipped and 9L40 used by default, the pilot screen would have
+prioritized a substantially different, and on the evidence above less
+trustworthy, set of compounds.
 
 \begin{table}[htbp]
 \centering
-\caption{Compounds with the largest rank shift between scoring against 9L4B (validated) and 9L40 (excluded), out of 40 pilot compounds.}
+\caption{Compounds with the largest rank shift between scoring against 9L4B (validated) and 9L40 (excluded), out of 40 pilot compounds, matched three-seed design.}
 \label{tab:errorprop}
 \small
 \begin{tabular}{lccc}
 \toprule
 Compound & Rank (9L40) & Rank (9L4B) & Rank shift \\
 \midrule
-deriv\_022 & 36 & 7  & 29 \\
-deriv\_010 & 11 & 39 & 28 \\
-deriv\_017 & 6  & 34 & 28 \\
-deriv\_015 & 13 & 38 & 25 \\
+deriv\_017 & 5  & 34 & 29 \\
+deriv\_010 & 10 & 39 & 29 \\
+deriv\_022 & 32 & 7  & 25 \\
 deriv\_033 & 34 & 9  & 25 \\
+deriv\_015 & 14 & 38 & 24 \\
 \bottomrule
 \end{tabular}
 \end{table}

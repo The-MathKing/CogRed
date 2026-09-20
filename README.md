@@ -31,25 +31,39 @@ Start here:
   that survives symmetry-corrected RMSD, ruling out the adjacent allosteric
   site as a confound, and re-validation at the exhaustiveness actually used
   for screening. A 40-compound BRICS-derived pipeline sanity-check screen
-  was then docked against the validated structure. As of round 4, this
-  n=1 finding was extended to a real 17-structure survey (14 additional
-  cryo-EM structures of an unrelated kinase, CDK7/cyclin H/MAT1): **82%
-  fail redocking, and wwPDB Q-score/residue inclusion do not predict which
-  ones will** (Q-score actually trends the wrong way) — a negative result
-  for the metric, reported as found. Flexible-sidechain docking (5
-  active-site residues) does not rescue 9L40's failing pose either, and
-  docking the same pilot library against 9L40 instead of the validated
-  9L4B produces a substantially different, less trustworthy ranking (only
-  5/10 shared top compounds) — a concrete demonstration of what the
+  was then docked against the validated structure. This n=1 finding was
+  extended (round 4) to a 17-structure survey (14 additional cryo-EM
+  structures of an unrelated kinase, CDK7/cyclin H/MAT1): **13/14 (93%)
+  fail redocking, and wwPDB Q-score/residue inclusion do not predict
+  which ones will** (Q-score actually trends the wrong way) — a negative
+  result for the metric, reported as found. A fifth external review then
+  caught two real errors (an arithmetic mistake in that fail count, and a
+  mischaracterized structure pair) and one confounded experiment
+  (flexible-sidechain docking), and demanded a decisive positive control
+  before the survey's core claim could be trusted: run the identical,
+  unmodified pipeline on an external, unbiased benchmark and compare its
+  pass rate to the literature. **That control was run for real** (20
+  objectively selected CASF-2016 complexes): the pipeline's own pass rate
+  (40%) is statistically indistinguishable from AutoDock Vina's
+  documented 58% self-docking baseline, ruling out a broken pipeline,
+  while the CAK survey's rate remains a significant outlier even against
+  that measured 40% baseline (p=0.008) — the finding survives. Corrected
+  under the same scrutiny: the flexible-docking test's original
+  comparison was confounded (box size and receptor prep changed along
+  with flexibility); a matched control shows flexibility genuinely helps,
+  just not enough to pass. Docking the same pilot library against 9L40
+  instead of the validated 9L4B still produces a substantially different,
+  less trustworthy ranking (5/10 shared top compounds, confirmed under a
+  matched 3-seed design) — a concrete demonstration of what the
   validation step prevents. Scope is deliberately narrower than the full
   pipeline below (no MD — no GPU available — no kinome panel, and the
   17-structure survey is a convenience sample, not a systematic one); see
   `data/pilot_run_v1/README.md` for the real data behind every number in
-  it, `docs/06_review_response_round3.md` for what a third external
-  review tried to break and what survived, and
-  `docs/07_review_response_round4.md` for the round-4 extension (survey,
-  flexible docking, error-propagation demo) and what did *not* come out
-  the way it was hoped to.
+  it, `docs/06_review_response_round3.md` and
+  `docs/07_review_response_round4.md` for what earlier external reviews
+  tried to break, and `docs/08_review_response_round5.md` for the
+  positive-control validation, the two claims withdrawn, and the two
+  confounds found and corrected.
 - **[`manuscript/draft_v1.md`](manuscript/draft_v1.md)** — the earlier,
   fully-`[PENDING]` draft against the *original*, larger-scope pipeline
   below, written when PubChem/ChEMBL/UCSC/RCSB and Vina/OpenMM/AmberTools
