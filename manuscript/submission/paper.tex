@@ -69,11 +69,11 @@ opposite of the expected direction, though only 2 of the 12 pass -- too
 few for this comparison to be more than descriptive), and residue
 inclusion showed no relationship ($r=-0.14$, $p=0.61$, $n=16$). Allowing
 five active-site residues to
-move during redocking (flexible-sidechain Vina) did not rescue the 9L40
-failure (mean symmetry-corrected RMSD $3.00\pm0.92$~{\AA} across three
-seeds, versus $2.53$~{\AA} rigid; no seed passed), arguing against a
-rigid-conformer artifact and for a genuine pose/receptor-conformation
-problem. Docking the same 40-compound pilot set against the excluded 9L40
+move during redocking (flexible-sidechain Vina) improved, but did not
+rescue, the 9L40 pose: mean symmetry-corrected RMSD $3.00\pm0.92$~{\AA}
+across three seeds, versus $4.50\pm0.05$~{\AA} in a matched rigid control
+(same enlarged box and receptor preparation, no flexible residues) --
+better, but no seed passed the $2.0$~{\AA} threshold. Docking the same 40-compound pilot set against the excluded 9L40
 structure instead of the validated 9L4B produced a substantially different
 ranking (Spearman $\rho=0.19$, $p=0.24$ between the two receptors' scores;
 only 5/10 compounds shared between the two top-10 lists), demonstrating
@@ -667,20 +667,40 @@ Structure & Resolution ({\AA}) & Symm. RMSD ({\AA}) & Pass & Q-score & Residue i
 \end{tabular}
 \end{table}
 
-\subsection*{Flexible-sidechain redocking does not rescue the 9L40 pose}
+\subsection*{Flexible-sidechain redocking: a confounded first comparison,
+corrected}
 
-Allowing the five active-site residues nearest the native berzosertib pose
-to move during docking did not recover it: mean symmetry-corrected RMSD
-across three seeds was $3.00\pm0.92$~{\AA} (individual seeds: $4.29$,
-$2.23$, $2.49$~{\AA}), marginally \emph{worse} than the fully rigid result
-($2.53$~{\AA}), and no seed passed the 2.0~{\AA} threshold. This argues
-against a simple rigid-conformer artifact -- if the failure were purely
-that the crystallized side-chain rotamers happened to occlude the correct
-pose, allowing them to relax should have helped, and it did not, even in
-the seed that came closest ($2.23$~{\AA}). It is consistent with either a
-genuinely less-supported deposited pose or a larger-scale conformational
-change (e.g., backbone motion, not captured by side-chain flexibility
-alone) that this low-compute test cannot distinguish.
+Allowing the five active-site residues nearest the native berzosertib
+pose to move during docking did not recover it: mean symmetry-corrected
+RMSD across three seeds was $3.00\pm0.92$~{\AA} (individual seeds:
+$4.29$, $2.23$, $2.49$~{\AA}), and no seed passed the 2.0~{\AA} threshold.
+An earlier version of this analysis compared this directly to the
+original fully rigid result ($2.53$~{\AA}, 22~{\AA} box, Open
+Babel-prepared ligand) and read the flexible run as marginally
+\emph{worse}. That comparison is invalid: the flexible run differs from
+the original rigid run in three ways at once (side-chain flexibility, a
+larger 30~{\AA} vs. 22~{\AA} box, and Meeko's automatic removal of
+$\sim$400 template-unmatched residues from the receptor), so attributing
+the difference to flexibility specifically was not supported. The matched
+control (Methods) isolates flexibility alone: fully rigid redocking with
+the identical 30~{\AA} box and the identical Meeko-prepared receptor and
+ligand, but no residues declared flexible, gives mean symmetry-corrected
+RMSD $4.50\pm0.05$~{\AA} -- \emph{worse} than either the original rigid
+result or the flexible result. Against this correctly matched baseline,
+allowing the five residues to move \emph{improved} the pose from
+$4.50$~{\AA} to $3.00$~{\AA}, a real effect in the expected direction; it
+simply was not enough to reach the $2.0$~{\AA} threshold. The larger box
+size and/or the Meeko receptor-preparation differences, not the choice to
+keep side chains rigid, account for most of the difference between the
+original $2.53$~{\AA} result and either Meeko-based result -- consistent
+with a larger box degrading Vina's search, as a tighter, better-targeted
+box gives the optimizer less irrelevant volume to explore. The corrected,
+apples-to-apples conclusion is narrower than either the original claim or
+its opposite: flexibility helps, modestly, exactly as would be expected if
+some of the failure is a rigid-conformer effect -- but it is not enough,
+on its own, to rescue the pose, so a genuinely less-supported deposited
+pose or a larger-scale conformational change beyond five side chains
+remains at least as plausible an explanation as before.
 
 \subsection*{Using the excluded structure would have skewed the pilot
 screen}
@@ -748,21 +768,28 @@ candidate explanations are a genuinely less well-supported deposited pose
 comparable Q-score but lower residue inclusion than 9L4B) and a genuine
 limitation of rigid-receptor Vina docking against this particular
 conformational state (e.g., an induced-fit effect specific to the
-dimer-interface-engaged assembly). A third test, run in this round,
-weighs against the simplest version of the second explanation: allowing
-the five nearest active-site residues to move during docking did not
-rescue the pose (mean symmetry-corrected RMSD $3.00\pm0.92$~{\AA} across
-three seeds, versus $2.53$~{\AA} rigid -- if anything slightly worse, and
-no seed passed). If the failure were simply that the crystallized
-side-chain rotamers were blocking the correct pose, relaxing them should
-have helped; it did not. This does not resolve the deposited-pose-quality
-vs. conformational-change question -- five side chains are a much smaller
-perturbation than backbone motion or an induced-fit rearrangement, which
-this low-compute test cannot access -- but it does rule out the most
-easily-fixed version of a rigid-conformer artifact, and shifts the balance
-of evidence somewhat further toward the deposited pose itself, or a
-larger-scale conformational effect, rather than a simple side-chain
-clash.
+dimer-interface-engaged assembly). A third test, run in this round, bears
+on the second explanation, though its first analysis was confounded and
+had to be corrected (Results): naively comparing the flexible-sidechain
+run ($3.00\pm0.92$~{\AA}) to the original rigid result ($2.53$~{\AA})
+suggested flexibility made things slightly worse, but that comparison
+changed box size and receptor preparation at the same time as
+flexibility. Against a properly matched rigid control (same enlarged box,
+same Meeko preparation, no flexible residues: $4.50\pm0.05$~{\AA}),
+allowing the five residues to move genuinely improved the pose
+($4.50\rightarrow3.00$~{\AA}) -- evidence \emph{for} a rigid-conformer
+contribution, not against one, the opposite of what the uncorrected
+comparison implied. It was still not enough to reach the $2.0$~{\AA}
+threshold, so a residual problem remains: either the five chosen residues
+are not the whole story (a larger-scale conformational change, e.g.
+backbone motion or an induced-fit rearrangement beyond side-chain
+reach), or the deposited pose itself is genuinely less well-supported.
+This test therefore now argues for a partial rigid-conformer effect
+compounding a separate, unresolved problem, rather than against a
+rigid-conformer explanation entirely -- a materially different reading
+than the one first reported, and reported here because catching and
+correcting the confound mattered more than keeping the original
+conclusion.
 
 This finding no longer rests on a single failing structure out of two
 tested. Extending the identical, independently re-validated pipeline to 14
@@ -881,7 +908,15 @@ inclusion correlation analysis is likewise underpowered by a
 pass-group-starved sample (2--3 passing structures of 17) and should be
 read as a negative result on this sample, not a general refutation that
 any map-quality metric could ever predict redocking reliability;
-(2) the BRICS recombination
+(1b) the flexible-sidechain redocking test's first, uncorrected comparison
+(reported in an earlier draft of this analysis) attributed a difference to
+side-chain flexibility that was actually driven mostly by an unmatched box
+size and receptor preparation change; the corrected, matched-control
+version is reported here, but this stands as a reminder that every
+comparison in this pilot needs its confounds enumerated before, not after,
+a reviewer catches them, and that the same risk could apply to comparisons
+elsewhere in this paper that have not been independently attacked as hard
+as this one was; (2) the BRICS recombination
 cap (5,000) is combinatorial, not principled, and a larger or differently
 seeded run would sample a different, likely larger, region of the
 accessible chemical space; (3) the 40-compound pilot library is a small,
@@ -930,8 +965,11 @@ off, rather than confirmed, the most convenient available explanation:
 wwPDB Q-score and residue inclusion do not predict which structures will
 fail, and in the case of Q-score trend mildly the wrong way. A
 flexible-sidechain redocking test -- a low-compute stand-in for molecular
-dynamics -- did not rescue the 9L40 pose either, arguing against the
-simplest rigid-conformer explanation. And docking the same pilot library
+dynamics -- improved the 9L40 pose relative to a properly matched rigid
+control, but not enough to rescue it, evidence for a partial
+rigid-conformer contribution rather than against one, and a correction
+to this paper's own first, confounded reading of that experiment. And
+docking the same pilot library
 against the excluded structure instead of the validated one produced a
 substantially different, and by the evidence above less trustworthy,
 compound ranking, demonstrating concretely what validation prevents.

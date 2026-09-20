@@ -11,5 +11,6 @@ data/docking/
 *.chk
 *.pdbqt
 *.log
+*.smi
 
 !data/README.md
