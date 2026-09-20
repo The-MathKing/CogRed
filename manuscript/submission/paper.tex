@@ -59,13 +59,16 @@ top-ranked, with no derivative exceeding the seed compounds.
 Extending this single-structure finding, the same validated pipeline was
 run on 14 additional recently deposited cryo-EM structures of an unrelated
 kinase complex (the CDK7/cyclin~H/MAT1 CDK-activating kinase, CAK, each
-bound to a distinct ATP-competitive inhibitor): 11/14 failed redocking
+bound to a distinct ATP-competitive inhibitor): 13/14 failed redocking
 (overall $n=17$ structures, 3/17 pass), showing the phenomenon is not
 specific to ATR. Across this survey, wwPDB map-model fit metrics did
-\emph{not} reliably predict which structures would fail: Q-score trended,
-if anything, in the wrong direction (point-biserial $r=-0.62$, $p=0.03$,
-$n=12$ with a Q-score reported), and residue inclusion showed no
-relationship ($r=-0.14$, $p=0.61$). Allowing five active-site residues to
+\emph{not} reliably predict which structures would fail: passing
+structures did not have higher Q-scores than failing ones (mean
+$0.569$ vs. $0.688$, $n=12$ with a Q-score reported, if anything the
+opposite of the expected direction, though only 2 of the 12 pass -- too
+few for this comparison to be more than descriptive), and residue
+inclusion showed no relationship ($r=-0.14$, $p=0.61$, $n=16$). Allowing
+five active-site residues to
 move during redocking (flexible-sidechain Vina) did not rescue the 9L40
 failure (mean symmetry-corrected RMSD $3.00\pm0.92$~{\AA} across three
 seeds, versus $2.53$~{\AA} rigid; no seed passed), arguing against a
@@ -353,6 +356,33 @@ wwPDB pipeline itself does not report a Q-score (only residue inclusion),
 which is a genuine absence in the primary data rather than an extraction
 failure.
 
+\subsection*{Positive-control validation against an external benchmark}
+
+Because the CAK failure rate (Results) is well below AutoDock Vina's
+documented self-docking success rate on curated benchmarks, the same
+unmodified pipeline was additionally run on a subset of the PDBbind Core
+Set (CASF-2016, 285 complexes) -- the exact benchmark against which
+Vina's reported 58\% self-docking success rate is measured
+\citep{zhang2023} -- as a positive control to distinguish a genuine
+finding about the CAK structure series from a pipeline artifact. The
+subset (20 PDB IDs) was the first 20 entries, in file order, of a
+complete, externally hosted CASF-2016 core-set listing (redistributed at
+\url{https://github.com/OptiMaL-PSE-Lab/DeepDock}, not curated or
+filtered by us), an objective selection rule fixed before any of these
+20 structures was inspected individually, to avoid any appearance of
+choosing easy targets. Because CASF-2016 entries span many unrelated
+protein families rather than one target's own co-crystallized ligand
+list, the bound ligand of interest was not manually specified per
+structure (as it was for ATR/CHK1/CAK); instead it was auto-detected as
+the largest non-polymer heteroatom group remaining after excluding water
+and a fixed list of common crystallization ions, buffers, and
+cryoprotectants (e.g. SO4, PO4, GOL, EDO, PEG, DMS, HEPES; the complete
+list was fixed before this batch was run and is in
+\texttt{casf\_validation.py}). All other steps (Open Babel PDBQT
+preparation, 22~{\AA} box centered on the ligand centroid, three seeded
+Vina replicates at exhaustiveness 16, symmetry-corrected RMSD against the
+$2.0$~{\AA} threshold) are identical to the CAK/ATR survey protocol.
+
 \subsection*{Flexible-sidechain redocking}
 
 As a low-compute alternative to molecular dynamics for distinguishing a
@@ -379,19 +409,29 @@ exhaustiveness 32, matching the rigid redocking protocol) were run, each
 in its own subprocess (running multiple flexible-docking \texttt{Vina}
 instances within one Python process triggered an unrelated native crash
 traced to import order between the \texttt{vina} and \texttt{spyrmsd}
-packages, not to the docking itself).
+packages, not to the docking itself). Because the flexible run differs
+from the original rigid redocking result in three ways at once (side-chain
+flexibility, a larger 30~{\AA} vs. 22~{\AA} box, and Meeko's automatic
+removal of $\sim$400 template-unmatched residues from the receptor), a
+matched control was additionally run: fully rigid redocking (no residues
+declared flexible) with the same 30~{\AA} box and the same
+Meeko-prepared receptor and ligand, isolating the effect of flexibility
+alone from the other two changes.
 
 \subsection*{Error-propagation demonstration}
 
 To make concrete what is lost by skipping the redocking validation step,
 the same 40-compound pilot set (identical SMILES, box size, and
 exhaustiveness) was additionally docked against 9L40 -- the structure the
-validation control excluded -- using one seed per compound (seed 2000;
-the existing 9L4B result already averages three seeds and this comparison
-only requires a representative single-seed score per structure, not a new
-triplicate campaign). The resulting per-compound ranking against 9L40 was
-compared to the existing ranking against 9L4B by Spearman rank correlation
-and by the overlap between each structure's top-10 compounds.
+validation control excluded -- first using one seed per compound (seed
+2000) and then, because a one-seed ranking is noisier than the
+three-seed-averaged 9L4B ranking it was being compared against (a design
+asymmetry that could depress the rank correlation on its own, independent
+of any real receptor difference), re-run with the same three seeds
+(2000, 2001, 2002) used for 9L4B, for a matched comparison. The resulting
+per-compound rankings against 9L40 (one-seed and three-seed) were each
+compared to the existing three-seed ranking against 9L4B by Spearman rank
+correlation and by the overlap between each structure's top-10 compounds.
 
 \subsection*{Computational environment}
 
@@ -456,7 +496,7 @@ artifact of the exhaustiveness setting used for validation.
 
 \begin{table}[htbp]
 \centering
-\caption{Redocking validation across three independent seeded Vina replicates (exhaustiveness 32). Resolution taken directly from each structure's \texttt{\_em\_3d\_reconstruction.resolution} mmCIF field.}
+\caption{Redocking validation across three independent seeded Vina replicates (exhaustiveness 32). Resolution taken directly from each structure's mmCIF record: the \texttt{\_em\_3d\_reconstruction.resolution} field for the two cryo-EM structures (9L40, 9L4B), or \texttt{\_reflns.d\_resolution\_high} for the X-ray structure (2YM8).}
 \label{tab:redocking}
 \small
 \begin{tabular}{lcccccc}
@@ -552,29 +592,50 @@ tested with this pipeline (the original 9L40/9L4B/2YM8 plus 14 CAK
 structures). 14/17 (82\%) fail the 2.0~{\AA} threshold; only 9L4B, 2YM8,
 and one CAK structure (8P75) pass. Failure is not confined to ATR: it
 recurs across an unrelated, independently solved kinase system at a
-similar (82\% vs. the ATR pair's 50\%, though n=2 there) rate. Resolution
-does not predict outcome (Spearman $\rho=-0.23$, $p=0.38$, across all 17):
-the passing and failing structures span an overlapping and, if anything,
-similarly narrow resolution range (1.8--3.2~{\AA}).
+similar or higher rate (CAK alone: 13/14, 93\%, vs. the ATR pair's 1/2,
+50\%, though n=2 there). Resolution does not predict outcome (Spearman
+$\rho=-0.28$, $p=0.28$, across all 17): the passing and failing
+structures span an overlapping and, if anything, similarly narrow
+resolution range (1.8--3.2~{\AA}, spanning both the X-ray structure 2YM8
+and the cryo-EM structures; the two resolution conventions are not
+strictly the same physical quantity, though with $n=17$ this distinction
+changes the correlation little).
 
 Nor do the wwPDB map-model fit metrics introduced in the previous round of
 this work as a candidate explanation for the 9L40 failure. Of the 12
 structures with a reported Q-score, the 2 passing structures have a
 \emph{lower} mean Q-score ($0.569$) than the 10 failing structures
-($0.688$); the point-biserial correlation between pass/fail and Q-score is
-$r=-0.62$ ($p=0.03$), the opposite sign from what would be expected if a
-higher Q-score meant a more reliable docking target. Residue inclusion
-shows no relationship ($r=-0.14$, $p=0.61$, $n=16$). Both correlations are
-computed on a small and, for Q-score, pass-group-starved sample (only 2--3
-of 17 structures pass at all), so neither should be read as a confident
-refutation of the map-quality hypothesis -- but they are also not the
-confirmation this survey set out to look for, and are reported as found.
-One structure pair sharpens this point directly: 8P74 and 8P75 are
-independent depositions of the \emph{same} CAK complex bound to the
-\emph{same} inhibitor (comp\_id X3Z), yet 8P74 fails redocking by 6.67~{\AA}
-while 8P75 passes at 1.03~{\AA} -- a same-target, same-ligand pair that
-disagrees on redocking outcome as starkly as 9L40/9L4B did, independent of
-any property of the bound compound itself.
+($0.688$) -- the opposite direction from what would be expected if a
+higher Q-score meant a more reliable docking target, though with only 2
+of 17 structures passing and reporting a Q-score, this is a descriptive
+observation, not a correlation with an interpretable p-value, and is
+reported that way rather than with a formal statistic that a 2-vs-10
+split cannot support. Residue inclusion shows no relationship at all
+($r=-0.14$, $p=0.61$, $n=16$, a comparison with enough passing structures
+with this field reported to support a correlation coefficient). Neither
+should be read as a confident refutation of the map-quality hypothesis --
+but neither is the confirmation this survey set out to look for, and both
+are reported as found.
+
+8P74 and 8P75 illustrate why this survey's ``failures'' need to be read
+individually, not only as a rate. They were reported in an earlier
+version of this analysis as independent depositions of the same complex
+bound to the same inhibitor, disagreeing on redocking outcome
+independent of any property of the compound -- a claim that does not
+survive checking their own deposition titles, which identify them as
+\emph{ring-up} and \emph{ring-down} conformational classes of the same
+flexible substituent (inhibitor ICEC0880, comp\_id X3Z), separated by the
+depositors from one underlying cryo-EM dataset because the ligand
+genuinely populates both conformations \citep{cushing2024}. A large RMSD
+between two deliberately separated conformer models is expected, not
+surprising, and this pair is not evidence of coordinate-set-specific
+unpredictability. It also does not support the natural alternative
+explanation -- that 8P74's docked pose is really a correct match to the
+\emph{other} deposited conformer, unfairly scored as a failure against
+the wrong reference: computed directly, 8P74's docked pose is
+$6.76$~{\AA} from 8P75's native ligand, no closer than the $6.67$~{\AA}
+from its own. Both checks are reported in full in the Discussion, along
+with what they leave open.
 
 \begin{table}[htbp]
 \centering
@@ -586,7 +647,7 @@ any property of the bound compound itself.
 Structure & Resolution ({\AA}) & Symm. RMSD ({\AA}) & Pass & Q-score & Residue incl. \\
 \midrule
 9L4B (ATR)  & 3.20 & 0.61 & Yes & 0.528 & 0.967 \\
-2YM8 (CHK1) & 2.00 & 0.76 & Yes & n/a   & n/a \\
+2YM8 (CHK1) & 2.07 & 0.76 & Yes & n/a   & n/a \\
 8P75 (CAK)  & 2.00 & 1.03 & Yes & 0.609 & 0.724 \\
 9L40 (ATR)  & 2.87 & 2.53 & No  & 0.553 & 0.818 \\
 8P72 (CAK)  & 1.90 & 2.70 & No  & 0.707 & 0.963 \\
@@ -706,32 +767,82 @@ clash.
 This finding no longer rests on a single failing structure out of two
 tested. Extending the identical, independently re-validated pipeline to 14
 additional recently deposited cryo-EM structures of an unrelated kinase
-system (CAK) found the same failure mode recurring at a similar rate
-(11/14, 79\%, vs. the ATR pair's 1/2), so structure-dependent redocking
-failure at $\leq$3.2~{\AA} resolution is not an ATR-specific or even a
-rare phenomenon in this sample -- it is closer to the norm than the
-exception. What did \emph{not} generalize is the hope, raised in the
-previous round of this work, that wwPDB map-model fit metrics (Q-score,
-residue inclusion) might explain or predict which structures fail: across
-17 structures, Q-score trends in the wrong direction (passing structures
-have \emph{lower}, not higher, mean Q-score) and residue inclusion shows
-no relationship at all. The 8P74/8P75 pair -- the same complex, the same
-bound inhibitor, one passing and one failing by a wide margin -- makes the
-same point without needing any correlation statistic: whatever determines
-redocking reliability here is specific to the individual deposited
-coordinate set, not a property of the target, the ligand, or (on this
-evidence) a single reported validation metric. The practical implication
-is therefore stronger, not weaker, than the previous round's: redocking
-validation is not a formality that a good enough map-quality score could
-substitute for, and per-structure empirical validation is not merely
-prudent but, on this evidence, close to necessary before any candidate is
-scored against a newly deposited structure -- cryo-EM or otherwise. This
-survey remains a sample of convenience (14 of the 17 structures come from
-one target's fragment-elaboration series, reachable via this session's
-network access, not a systematic or stratified sample of recent kinase
-depositions; see Limitations), and turning ``close to necessary'' into a
-precise, generalizable failure rate would need a larger, more
-deliberately sampled follow-up.
+system (CAK) found the same failure mode recurring at a similar or higher
+rate (13/14, 93\%, vs. the ATR pair's 1/2), so structure-dependent
+redocking failure at $\leq$3.2~{\AA} resolution is not an ATR-specific
+phenomenon in this sample. What did \emph{not} generalize is the hope,
+raised in the previous round of this work, that wwPDB map-model fit
+metrics (Q-score, residue inclusion) might explain or predict which
+structures fail: across 17 structures, Q-score trends in the wrong
+direction (passing structures have \emph{lower}, not higher, mean
+Q-score) and residue inclusion shows no relationship at all.
+
+One pair initially seemed to sharpen this point without needing a
+correlation statistic, and is worth reporting in full because checking it
+changed the conclusion. 8P74 and 8P75 are not, as an earlier draft of this
+analysis stated, independent depositions of the same complex bound to the
+same inhibitor: their own deposition titles identify them as
+\emph{ring-up} and \emph{ring-down} conformational classes of the same
+flexible benzylamine substituent (inhibitor ICEC0880, comp\_id X3Z),
+computationally separated from the underlying cryo-EM data by the
+depositors because the ligand populates both conformations
+\citep{cushing2024}. A large RMSD between the two deposited models is
+therefore expected by construction, and citing this pair as evidence that
+reliability depends on ``the individual deposited coordinate set,
+independent of any property of the bound compound'' was wrong -- it
+depends here on a property of the compound (conformational heterogeneity)
+that this pair was deliberately used to represent. Having caught the
+mischaracterization, we tested the specific alternative reading it
+suggests -- that Vina's docked pose for 8P74 is not really wrong, but
+matches the \emph{other} deposited conformer (8P75's ring-down model) and
+was unfairly scored as a failure against the wrong reference -- by
+computing symmetry-corrected RMSD between 8P74's docked pose and 8P75's
+native ligand directly. It does not: $6.76$~{\AA} from 8P75's native,
+statistically indistinguishable from the $6.67$~{\AA} from 8P74's own
+native. The docked pose is not a good match to either deposited
+conformer. So the corrected reading of this pair is narrower than either
+the original claim or its natural alternative: 8P74/8P75 is not usable
+evidence for coordinate-set-specific unpredictability (that claim is
+withdrawn), but it is also not simply a case of Vina finding a legitimate
+alternate pose scored as a failure -- centroid-distance analysis of this
+and the other 12 CAK failures (below) points to a third category instead.
+
+Measuring where the docked poses actually land, rather than only their
+RMSD to a single reference, adds a useful distinction the RMSD number
+alone does not make. Across all 13 CAK failures, the docked ligand's
+centroid stays close to its native centroid (1.1--4.1~{\AA}, including
+$2.70$~{\AA} for 8P74) despite RMSDs of $5$--$7$~{\AA}: the ligand is not
+leaving the pocket, it is adopting a substantially different orientation
+\emph{within} it. This is inconsistent with the crudest failure mode a
+setup error would produce (a mispositioned or oversized box ejecting the
+ligand from the site entirely, which would show large centroid shifts) and
+is more consistent with either an orientational degeneracy in this
+scaffold's hinge-binding mode or a receptor/ligand-preparation effect that
+biases pose orientation without moving the ligand out of the site -- a
+distinction this pilot's scope does not let us resolve further (see
+Limitations for what would).
+
+The practical implication of the 13/14 CAK failure rate is nonetheless
+substantial if it holds up: it would mean redocking validation is not a
+formality that a good enough map-quality score could substitute for, and
+that per-structure empirical validation is close to necessary before any
+candidate is scored against a newly deposited structure. That rate is,
+however, far below what AutoDock Vina is documented to achieve on
+curated self-docking benchmarks (Vina's reported self-docking success
+rate on the 285-complex PDBbind Core Set is 58\% \citep{zhang2023}), which
+raises a real question this pilot cannot dismiss: is 13/14 a genuine
+property of this structure series, or a symptom of a receptor/ligand
+preparation issue specific to this pipeline's handling of the CAK
+complex? A positive-control redocking run of this same, unmodified
+pipeline against an independent, externally-curated benchmark set is the
+direct way to distinguish these, and is reported next rather than left as
+an open question, since running it is cheap relative to the difference it
+makes to how the 13/14 figure should be read.
+
+This survey remains a sample of convenience regardless of that outcome
+(14 of the 17 structures come from one target's fragment-elaboration
+series, reachable via this session's network access, not a systematic or
+stratified sample of recent kinase depositions; see Limitations).
 
 The pilot docking result is, appropriately for a 35-derivative pilot,
 modest rather than dramatic: no generated derivative exceeded the predicted
