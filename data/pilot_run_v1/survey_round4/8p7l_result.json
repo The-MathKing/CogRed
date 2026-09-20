@@ -1,0 +1,28 @@
+{
+  "pdbid": "8p7l",
+  "ligand_comp_id": "WD9",
+  "resolution": 2.1,
+  "deposition_date": "2023-05-30",
+  "ligand_copy_used": "J401",
+  "n_ligand_copies_total": 1,
+  "box_center": [
+    158.09713745117188,
+    137.97525024414062,
+    125.81477355957031
+  ],
+  "symm_rmsd_values": [
+    6.146896897520732,
+    6.141793625440373,
+    6.198973619680927
+  ],
+  "symm_rmsd_mean": 6.162554714214011,
+  "symm_rmsd_std": 0.025836193644287256,
+  "vina_scores": [
+    -8.353,
+    -8.34,
+    -8.553
+  ],
+  "passes_2.0A": false,
+  "Q_score": 0.708,
+  "residue_inclusion": 0.9688
+}

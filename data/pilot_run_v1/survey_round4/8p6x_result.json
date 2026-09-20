@@ -1,0 +1,28 @@
+{
+  "pdbid": "8p6x",
+  "ligand_comp_id": "NS9",
+  "resolution": 1.9,
+  "deposition_date": "2023-05-30",
+  "ligand_copy_used": "J401",
+  "n_ligand_copies_total": 1,
+  "box_center": [
+    156.0339813232422,
+    138.3131866455078,
+    125.97987365722656
+  ],
+  "symm_rmsd_values": [
+    6.575535037980884,
+    6.667250565798682,
+    6.553460503537695
+  ],
+  "symm_rmsd_mean": 6.598748702439088,
+  "symm_rmsd_std": 0.0492693294083539,
+  "vina_scores": [
+    -8.7,
+    -8.728,
+    -8.796
+  ],
+  "passes_2.0A": false,
+  "Q_score": NaN,
+  "residue_inclusion": 0.9643
+}

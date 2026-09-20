@@ -102,3 +102,37 @@ rather than saved pipeline outputs): the 60.65 Å centroid-to-centroid
 distance from 9L40's active-site ligand to its nearest allosteric-site
 copy, ruling out the docking box reaching the emptied allosteric pocket as
 a confound.
+
+## `survey_round4/`, `flexible_docking_round4/`, `error_propagation_9l40/` — added for the JCAMD elevation strategy (round 4)
+
+Real data behind the three new analyses in `docs/07_review_response_round4.md`:
+
+- `survey_round4/survey_structure.py` — the generalized redocking-validation
+  pipeline (contact-based ligand disambiguation, Open Babel PDBQT prep,
+  3-seed replicate redocking, symmetry-corrected RMSD, wwPDB Q-score/
+  residue-inclusion extraction), applied to 14 additional cryo-EM
+  structures of the CDK7/cyclin H/MAT1 CDK-activating kinase (CAK,
+  Cushing et al. 2024, *Nat. Commun.* 15:2265). `run_batch.py` is the
+  batch driver; `*_result.json` are the per-structure results;
+  `survey_combined.json` merges these with the original 9L40/9L4B/2YM8
+  results into the full n=17 dataset reported in the paper's Table 4.
+  `9l4b_pipeline_validation_check.json` is the sanity check that this
+  generalized script reproduces the original hand-curated 9L4B result
+  before any CAK result was trusted. Real finding: 14/17 (82%) fail
+  redocking; Q-score/residue inclusion do not predict pass/fail (if
+  anything Q-score trends the wrong way) — reported as found, not spun.
+- `flexible_docking_round4/run_flexible_redocking_one_seed.py` /
+  `flexible_redocking_results.json` — flexible-sidechain Vina redocking of
+  9L40 (5 active-site residues free to move, Meeko-prepared receptor/
+  ligand), 3 seeded replicates run as isolated subprocesses (a real
+  import-order crash between `vina` and `spyrmsd`, initially
+  misattributed to Vina-object reuse, is documented in the script's
+  docstring). Real finding: flexibility does not rescue the pose (mean
+  symmetry-corrected RMSD 3.00±0.92 Å, vs. 2.53 Å rigid — slightly worse,
+  not better).
+- `error_propagation_9l40/run_library_docking_9l40.py` /
+  `atr_docking_results_9l40_raw.csv` / `rank_comparison_9l40_vs_9l4b.csv`
+  — the same 40-compound pilot library docked against 9L40 (the excluded
+  structure) instead of 9L4B (the validated one), to quantify what
+  skipping the validation step would have cost: Spearman ρ=0.19 (p=0.24)
+  between the two receptors' rankings, only 5/10 shared top compounds.

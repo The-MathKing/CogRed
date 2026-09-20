@@ -1,0 +1,38 @@
+{
+  "flexible_residues": [
+    "A:2327 (LYS)",
+    "A:2365 (TYR)",
+    "A:2378 (GLU)",
+    "A:2379 (TRP)",
+    "A:2477 (HIS)"
+  ],
+  "naive_rmsd_mean": 3.344192958718928,
+  "naive_rmsd_std": 0.8478037209750794,
+  "symm_rmsd_mean": 3.002751211209967,
+  "symm_rmsd_std": 0.915527210228067,
+  "passes_2.0A_symm": false,
+  "n_seeds_individually_passing": 0,
+  "comparison_rigid_symm_rmsd_mean": 2.53,
+  "raw": {
+    "naive_rmsd": [
+      4.54269872371528,
+      2.715876827922144,
+      2.7740033245193594
+    ],
+    "symm_rmsd": [
+      4.2881572470884946,
+      2.225572912280968,
+      2.4945234742604385
+    ],
+    "vina_score": [
+      -9.795,
+      -9.547,
+      -9.233
+    ],
+    "seeds": [
+      1000,
+      1001,
+      1002
+    ]
+  }
+}

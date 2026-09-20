@@ -1,0 +1,28 @@
+{
+  "pdbid": "8p70",
+  "ligand_comp_id": "X4Q",
+  "resolution": 2.0,
+  "deposition_date": "2023-05-30",
+  "ligand_copy_used": "J401",
+  "n_ligand_copies_total": 1,
+  "box_center": [
+    157.39239501953125,
+    138.13632202148438,
+    125.41422271728516
+  ],
+  "symm_rmsd_values": [
+    6.244944155074569,
+    6.250217676209366,
+    6.247746861561684
+  ],
+  "symm_rmsd_mean": 6.247636230948539,
+  "symm_rmsd_std": 0.002154326753181793,
+  "vina_scores": [
+    -7.94,
+    -7.891,
+    -7.891
+  ],
+  "passes_2.0A": false,
+  "Q_score": NaN,
+  "residue_inclusion": 1.0
+}

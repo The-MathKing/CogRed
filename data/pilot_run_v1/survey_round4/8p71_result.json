@@ -1,0 +1,28 @@
+{
+  "pdbid": "8p71",
+  "ligand_comp_id": "X4F",
+  "resolution": 2.0,
+  "deposition_date": "2023-05-30",
+  "ligand_copy_used": "J401",
+  "n_ligand_copies_total": 1,
+  "box_center": [
+    157.15956115722656,
+    138.0194854736328,
+    125.20806121826172
+  ],
+  "symm_rmsd_values": [
+    7.016418536124687,
+    7.01188866616311,
+    7.0353978065420195
+  ],
+  "symm_rmsd_mean": 7.021235002943272,
+  "symm_rmsd_std": 0.01018393129067276,
+  "vina_scores": [
+    -8.107,
+    -8.159,
+    -8.104
+  ],
+  "passes_2.0A": false,
+  "Q_score": 0.72,
+  "residue_inclusion": 0.9259
+}

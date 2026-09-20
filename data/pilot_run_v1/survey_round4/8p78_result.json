@@ -1,0 +1,28 @@
+{
+  "pdbid": "8p78",
+  "ligand_comp_id": "1QK",
+  "resolution": 1.9,
+  "deposition_date": "2023-05-30",
+  "ligand_copy_used": "J401",
+  "n_ligand_copies_total": 1,
+  "box_center": [
+    157.30992126464844,
+    137.85824584960938,
+    125.67716979980469
+  ],
+  "symm_rmsd_values": [
+    2.9874176427834476,
+    2.9735315355824725,
+    2.9702465937336258
+  ],
+  "symm_rmsd_mean": 2.9770652573665153,
+  "symm_rmsd_std": 0.00744207066181227,
+  "vina_scores": [
+    -8.519,
+    -8.478,
+    -8.524
+  ],
+  "passes_2.0A": false,
+  "Q_score": NaN,
+  "residue_inclusion": 0.8276
+}

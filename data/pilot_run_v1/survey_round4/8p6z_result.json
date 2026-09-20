@@ -1,0 +1,28 @@
+{
+  "pdbid": "8p6z",
+  "ligand_comp_id": "X4L",
+  "resolution": 2.1,
+  "deposition_date": "2023-05-30",
+  "ligand_copy_used": "J401",
+  "n_ligand_copies_total": 1,
+  "box_center": [
+    156.90440368652344,
+    137.8077392578125,
+    125.5985107421875
+  ],
+  "symm_rmsd_values": [
+    2.176087287912732,
+    6.170721061843337,
+    6.179434309434437
+  ],
+  "symm_rmsd_mean": 4.842080886396835,
+  "symm_rmsd_std": 1.885145508184016,
+  "vina_scores": [
+    -8.619,
+    -8.319,
+    -8.261
+  ],
+  "passes_2.0A": false,
+  "Q_score": 0.705,
+  "residue_inclusion": 0.8846
+}

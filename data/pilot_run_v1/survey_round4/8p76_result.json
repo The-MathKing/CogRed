@@ -1,0 +1,28 @@
+{
+  "pdbid": "8p76",
+  "ligand_comp_id": "X1W",
+  "resolution": 2.0,
+  "deposition_date": "2023-05-30",
+  "ligand_copy_used": "J401",
+  "n_ligand_copies_total": 1,
+  "box_center": [
+    157.55455017089844,
+    137.212158203125,
+    126.72931671142578
+  ],
+  "symm_rmsd_values": [
+    6.603874255046849,
+    6.592577686976737,
+    6.598353649385046
+  ],
+  "symm_rmsd_mean": 6.598268530469544,
+  "symm_rmsd_std": 0.004612197340603017,
+  "vina_scores": [
+    -9.511,
+    -9.508,
+    -9.497
+  ],
+  "passes_2.0A": false,
+  "Q_score": 0.64,
+  "residue_inclusion": 0.7353
+}

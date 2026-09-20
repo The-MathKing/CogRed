@@ -31,12 +31,25 @@ Start here:
   that survives symmetry-corrected RMSD, ruling out the adjacent allosteric
   site as a confound, and re-validation at the exhaustiveness actually used
   for screening. A 40-compound BRICS-derived pipeline sanity-check screen
-  was then docked against the validated structure. Scope is deliberately
-  much narrower than the full pipeline below (single target, no MD/MM-GBSA
-  — no GPU available — no kinome panel, n=1 on the central finding); see
+  was then docked against the validated structure. As of round 4, this
+  n=1 finding was extended to a real 17-structure survey (14 additional
+  cryo-EM structures of an unrelated kinase, CDK7/cyclin H/MAT1): **82%
+  fail redocking, and wwPDB Q-score/residue inclusion do not predict which
+  ones will** (Q-score actually trends the wrong way) — a negative result
+  for the metric, reported as found. Flexible-sidechain docking (5
+  active-site residues) does not rescue 9L40's failing pose either, and
+  docking the same pilot library against 9L40 instead of the validated
+  9L4B produces a substantially different, less trustworthy ranking (only
+  5/10 shared top compounds) — a concrete demonstration of what the
+  validation step prevents. Scope is deliberately narrower than the full
+  pipeline below (no MD — no GPU available — no kinome panel, and the
+  17-structure survey is a convenience sample, not a systematic one); see
   `data/pilot_run_v1/README.md` for the real data behind every number in
-  it, and `docs/06_review_response_round3.md` for what a third external
-  review tried to break and what survived.
+  it, `docs/06_review_response_round3.md` for what a third external
+  review tried to break and what survived, and
+  `docs/07_review_response_round4.md` for the round-4 extension (survey,
+  flexible docking, error-propagation demo) and what did *not* come out
+  the way it was hoped to.
 - **[`manuscript/draft_v1.md`](manuscript/draft_v1.md)** — the earlier,
   fully-`[PENDING]` draft against the *original*, larger-scope pipeline
   below, written when PubChem/ChEMBL/UCSC/RCSB and Vina/OpenMM/AmberTools

@@ -1,4 +1,4 @@
-\begin{thebibliography}{20}
+\begin{thebibliography}{21}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
@@ -130,5 +130,15 @@ Rocco Meli and Philip~C. Biggin.
 \newblock spyrmsd: symmetry-corrected rmsd calculations in python.
 \newblock \emph{Journal of Cheminformatics}, 12:\penalty0 49, 2020.
 \newblock \doi{10.1186/s13321-020-00455-2}.
+
+\bibitem[Cushing et~al.(2024)Cushing, Koh, Feng, Jurgaityte, Bondke, Kroll,
+  Barbazanges, Scheiper, Bahl, Barrett, Ali, Kotecha, and Greber]{cushing2024}
+Victoria~I. Cushing, Ai~Fang Koh, Jing Feng, Kotryna Jurgaityte, Alexander
+  Bondke, Simon H.~B. Kroll, Maud Barbazanges, Bernhard Scheiper, Anup~K. Bahl,
+  Anthony G.~M. Barrett, Simak Ali, Abhay Kotecha, and Basil~J. Greber.
+\newblock High-resolution cryo-em of the human cdk-activating kinase for
+  structure-based drug design.
+\newblock \emph{Nature Communications}, 15:\penalty0 2265, 2024.
+\newblock \doi{10.1038/s41467-024-46375-9}.
 
 \end{thebibliography}

@@ -1,0 +1,17 @@
+{
+  "pdbid": "9l4b",
+  "ligand_comp_id": "A1EIK",
+  "resolution": 3.2,
+  "deposition_date": "2024-12-20",
+  "ligand_copy_used": "A2701",
+  "n_ligand_copies_total": 2,
+  "box_center": [142.85806274414062, 212.67897033691406, 181.5302276611328],
+  "symm_rmsd_values": [0.5584412532517016, 0.6196268500745716, 0.6202084327062968],
+  "symm_rmsd_mean": 0.5994255120108566,
+  "symm_rmsd_std": 0.02898121988595852,
+  "vina_scores": [-10.785, -10.757, -10.742],
+  "passes_2.0A": true,
+  "Q_score": 0.528,
+  "residue_inclusion": 0.9667,
+  "_note": "Re-run of the general-purpose survey_structure.py pipeline (not the original hand-curated round-3 script) on 9L4B, as a validation that the generalized survey pipeline reproduces the known result (round-3 paper: symm RMSD 0.61+/-0.02 A, Q-score 0.528, residue_inclusion 0.967) before trusting it on new CAK structures."
+}

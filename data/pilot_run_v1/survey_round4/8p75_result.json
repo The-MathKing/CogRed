@@ -1,0 +1,28 @@
+{
+  "pdbid": "8p75",
+  "ligand_comp_id": "X3Z",
+  "resolution": 2.0,
+  "deposition_date": "2023-05-30",
+  "ligand_copy_used": "J401",
+  "n_ligand_copies_total": 1,
+  "box_center": [
+    156.60321044921875,
+    137.84024047851562,
+    126.07330322265625
+  ],
+  "symm_rmsd_values": [
+    1.0119443899127378,
+    1.053285827533419,
+    1.020570073959683
+  ],
+  "symm_rmsd_mean": 1.02860009713528,
+  "symm_rmsd_std": 0.017807106639141465,
+  "vina_scores": [
+    -8.219,
+    -8.26,
+    -8.235
+  ],
+  "passes_2.0A": true,
+  "Q_score": 0.609,
+  "residue_inclusion": 0.7241
+}

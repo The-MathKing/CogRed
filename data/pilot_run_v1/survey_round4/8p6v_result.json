@@ -1,0 +1,28 @@
+{
+  "pdbid": "8p6v",
+  "ligand_comp_id": "I74",
+  "resolution": 1.9,
+  "deposition_date": "2023-05-30",
+  "ligand_copy_used": "J401",
+  "n_ligand_copies_total": 1,
+  "box_center": [
+    156.37815856933594,
+    137.9990692138672,
+    125.3994140625
+  ],
+  "symm_rmsd_values": [
+    6.1361672834950065,
+    6.141493620981116,
+    6.138190758937314
+  ],
+  "symm_rmsd_mean": 6.138617221137811,
+  "symm_rmsd_std": 0.002195278305868316,
+  "vina_scores": [
+    -8.747,
+    -8.719,
+    -8.396
+  ],
+  "passes_2.0A": false,
+  "Q_score": 0.738,
+  "residue_inclusion": 0.9655
+}

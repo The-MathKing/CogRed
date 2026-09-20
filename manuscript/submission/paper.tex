@@ -56,11 +56,31 @@ from scoring per the pre-specified rule. A 40-compound sanity-check screen
 (5 seeds + 35 developability-passed derivatives) against the validated
 9L4B structure recovered camonsertib -- the receptor's own ligand -- as
 top-ranked, with no derivative exceeding the seed compounds.
+Extending this single-structure finding, the same validated pipeline was
+run on 14 additional recently deposited cryo-EM structures of an unrelated
+kinase complex (the CDK7/cyclin~H/MAT1 CDK-activating kinase, CAK, each
+bound to a distinct ATP-competitive inhibitor): 11/14 failed redocking
+(overall $n=17$ structures, 3/17 pass), showing the phenomenon is not
+specific to ATR. Across this survey, wwPDB map-model fit metrics did
+\emph{not} reliably predict which structures would fail: Q-score trended,
+if anything, in the wrong direction (point-biserial $r=-0.62$, $p=0.03$,
+$n=12$ with a Q-score reported), and residue inclusion showed no
+relationship ($r=-0.14$, $p=0.61$). Allowing five active-site residues to
+move during redocking (flexible-sidechain Vina) did not rescue the 9L40
+failure (mean symmetry-corrected RMSD $3.00\pm0.92$~{\AA} across three
+seeds, versus $2.53$~{\AA} rigid; no seed passed), arguing against a
+rigid-conformer artifact and for a genuine pose/receptor-conformation
+problem. Docking the same 40-compound pilot set against the excluded 9L40
+structure instead of the validated 9L4B produced a substantially different
+ranking (Spearman $\rho=0.19$, $p=0.24$ between the two receptors' scores;
+only 5/10 compounds shared between the two top-10 lists), demonstrating
+concretely what is lost by skipping the validation step.
 \textbf{Conclusions:} A newly deposited, high-resolution structure is not
 automatically a reliable docking receptor; this can only be established
 empirically, per structure and per protocol, before any candidate is
-scored. This n=1 finding motivates a larger survey using the same
-pipeline. All code, data, and structures are openly available.
+scored, and -- at least in this $n=17$ sample -- cannot be substituted for
+by a map-model fit metric alone. All code, data, and structures are openly
+available.
 \end{abstract}
 
 \noindent\textbf{Keywords:} ATR kinase; molecular docking; redocking
@@ -295,6 +315,84 @@ compound alongside the mean and standard deviation; the mean is the primary
 statistic discussed in Results, since the best-of-three is a biased
 (downward) estimator.
 
+\subsection*{Multi-structure survey}
+
+To test whether the 9L40 failure generalizes beyond a single structure, the
+identical validation protocol (ligand and receptor extraction with
+contact-based disambiguation of multiple ligand copies, Open
+Babel-prepared PDBQTs, three seeded Vina replicates at exhaustiveness 16,
+symmetry-corrected RMSD, wwPDB validation-report parsing) was packaged into
+a single script and applied to 14 additional, recently deposited cryo-EM
+structures identified via a literature/PDB search for the CDK7/cyclin~H/MAT1
+CDK-activating kinase (CAK) complex \citep{cushing2024}, each bound to a
+distinct ATP-competitive inhibitor (PDB 8P6V, 8P6W, 8P6X, 8P6Z,
+8P70--8P78, 8P7L;
+one entry, 8P73, has two independent bound ligand copies of different
+diastereomers, of which the lower cross-chain-contact copy was used). CAK
+was chosen as the extension target not because of any relationship to
+ATR/CHK1 biology, but because it is an unrelated, recently deposited,
+cryo-EM-solved, small-molecule-bound kinase system -- exactly the setting
+needed to test whether the redocking-failure phenomenon is an ATR-specific
+artifact or recurs across recent kinase depositions generally. Before
+trusting any CAK-structure result, the pipeline itself was validated by
+re-running it, unmodified, on 9L4B (a receptor with an independently known
+redocking outcome): it reproduced the original hand-curated result almost
+exactly (symmetry-corrected RMSD $0.60\pm0.03$~{\AA} vs. the original
+$0.61\pm0.02$~{\AA}; Q-score $0.528$, identical to 3 decimal places;
+residue inclusion $0.967$, identical to 3 decimal places), so the survey
+pipeline is not a separate, unvalidated instrument. Two structures
+(8P6v and 8P6w, i.e., an initial pilot pair) were additionally
+cross-checked by direct inspection of the mmCIF ligand entities and
+contact patterns before the full batch was run. wwPDB Q-score and residue
+inclusion were extracted for each structure's bound ligand from the
+official validation XML report where present; both fields are cryo-EM-only
+metrics (X-ray entries such as 2YM8 report real-space correlation
+coefficient/real-space R-value instead and correctly have no Q-score), and
+four CAK entries have a dual-occupancy (split-altloc) ligand for which the
+wwPDB pipeline itself does not report a Q-score (only residue inclusion),
+which is a genuine absence in the primary data rather than an extraction
+failure.
+
+\subsection*{Flexible-sidechain redocking}
+
+As a low-compute alternative to molecular dynamics for distinguishing a
+rigid-conformer docking artifact from a genuine pose/receptor problem, 9L40
+was redocked with AutoDock Vina's built-in flexible-sidechain feature,
+allowing five active-site residues within 4.5~{\AA} of the native
+berzosertib pose (chain A: LYS2327, TYR2365, GLU2378, TRP2379, HIS2477) to
+move during docking while the remainder of the receptor stayed rigid.
+Rigid and flexible receptor parts were prepared with Meeko
+(\texttt{mk\_prepare\_receptor.py}), which required an explicit histidine
+tautomer assignment for HIS2477 (HIE) and automatic removal of $\sim$400
+residues elsewhere in the structure whose side-chain density could not be
+template-matched (typical of a $\sim$3~{\AA} cryo-EM map in surface/loop
+regions; none of the five target flexible residues were among those
+removed). The ligand was likewise prepared with Meeko
+(\texttt{mk\_prepare\_ligand.py}, requiring explicit hydrogens) for
+atom-typing consistency with the Meeko-prepared flexible receptor; mixing
+an Open Babel-typed ligand with a Meeko-typed flexible receptor caused
+Vina's native C++ layer to abort rather than dock. The docking box was
+enlarged from 22~{\AA} (rigid redocking) to 30~{\AA} to give the flexible
+side chains room to explore alternate rotamers without a
+ligand-outside-box error; three seeded replicates (1000, 1001, 1002,
+exhaustiveness 32, matching the rigid redocking protocol) were run, each
+in its own subprocess (running multiple flexible-docking \texttt{Vina}
+instances within one Python process triggered an unrelated native crash
+traced to import order between the \texttt{vina} and \texttt{spyrmsd}
+packages, not to the docking itself).
+
+\subsection*{Error-propagation demonstration}
+
+To make concrete what is lost by skipping the redocking validation step,
+the same 40-compound pilot set (identical SMILES, box size, and
+exhaustiveness) was additionally docked against 9L40 -- the structure the
+validation control excluded -- using one seed per compound (seed 2000;
+the existing 9L4B result already averages three seeds and this comparison
+only requires a representative single-seed score per structure, not a new
+triplicate campaign). The resulting per-compound ranking against 9L40 was
+compared to the existing ranking against 9L4B by Spearman rank correlation
+and by the overlap between each structure's top-10 compounds.
+
 \subsection*{Computational environment}
 
 All calculations were run with AutoDock Vina 1.2.7 (Python bindings) and
@@ -445,6 +543,119 @@ deriv\_026          & derivative & $-8.94 \pm 0.00$ & $-8.94$ \\
 \end{tabular}
 \end{table}
 
+\subsection*{Multi-structure survey: redocking failure recurs, and wwPDB
+map-model fit metrics do not predict it}
+
+Table~\ref{tab:survey} reports symmetry-corrected redocking RMSD,
+resolution, and wwPDB Q-score/residue inclusion for all 17 structures now
+tested with this pipeline (the original 9L40/9L4B/2YM8 plus 14 CAK
+structures). 14/17 (82\%) fail the 2.0~{\AA} threshold; only 9L4B, 2YM8,
+and one CAK structure (8P75) pass. Failure is not confined to ATR: it
+recurs across an unrelated, independently solved kinase system at a
+similar (82\% vs. the ATR pair's 50\%, though n=2 there) rate. Resolution
+does not predict outcome (Spearman $\rho=-0.23$, $p=0.38$, across all 17):
+the passing and failing structures span an overlapping and, if anything,
+similarly narrow resolution range (1.8--3.2~{\AA}).
+
+Nor do the wwPDB map-model fit metrics introduced in the previous round of
+this work as a candidate explanation for the 9L40 failure. Of the 12
+structures with a reported Q-score, the 2 passing structures have a
+\emph{lower} mean Q-score ($0.569$) than the 10 failing structures
+($0.688$); the point-biserial correlation between pass/fail and Q-score is
+$r=-0.62$ ($p=0.03$), the opposite sign from what would be expected if a
+higher Q-score meant a more reliable docking target. Residue inclusion
+shows no relationship ($r=-0.14$, $p=0.61$, $n=16$). Both correlations are
+computed on a small and, for Q-score, pass-group-starved sample (only 2--3
+of 17 structures pass at all), so neither should be read as a confident
+refutation of the map-quality hypothesis -- but they are also not the
+confirmation this survey set out to look for, and are reported as found.
+One structure pair sharpens this point directly: 8P74 and 8P75 are
+independent depositions of the \emph{same} CAK complex bound to the
+\emph{same} inhibitor (comp\_id X3Z), yet 8P74 fails redocking by 6.67~{\AA}
+while 8P75 passes at 1.03~{\AA} -- a same-target, same-ligand pair that
+disagrees on redocking outcome as starkly as 9L40/9L4B did, independent of
+any property of the bound compound itself.
+
+\begin{table}[htbp]
+\centering
+\caption{Multi-structure survey: redocking outcome, resolution, and wwPDB map-model fit metrics (Q-score, residue inclusion) for all 17 structures tested, sorted by symmetry-corrected RMSD. n/a: metric not reported for this experimental method (X-ray) or ligand occupancy state (split-altloc CAK ligands); see Methods.}
+\label{tab:survey}
+\small
+\begin{tabular}{lccccc}
+\toprule
+Structure & Resolution ({\AA}) & Symm. RMSD ({\AA}) & Pass & Q-score & Residue incl. \\
+\midrule
+9L4B (ATR)  & 3.20 & 0.61 & Yes & 0.528 & 0.967 \\
+2YM8 (CHK1) & 2.00 & 0.76 & Yes & n/a   & n/a \\
+8P75 (CAK)  & 2.00 & 1.03 & Yes & 0.609 & 0.724 \\
+9L40 (ATR)  & 2.87 & 2.53 & No  & 0.553 & 0.818 \\
+8P72 (CAK)  & 1.90 & 2.70 & No  & 0.707 & 0.963 \\
+8P78 (CAK)  & 1.90 & 2.98 & No  & n/a   & 0.828 \\
+8P6Z (CAK)  & 2.10 & 4.84 & No  & 0.705 & 0.885 \\
+8P77 (CAK)  & 1.80 & 5.02 & No  & n/a   & 0.793 \\
+8P73 (CAK)  & 2.00 & 5.84 & No  & 0.722 & 0.800 \\
+8P6V (CAK)  & 1.90 & 6.14 & No  & 0.738 & 0.966 \\
+8P7L (CAK)  & 2.10 & 6.16 & No  & 0.708 & 0.969 \\
+8P70 (CAK)  & 2.00 & 6.25 & No  & n/a   & 1.000 \\
+8P76 (CAK)  & 2.00 & 6.60 & No  & 0.640 & 0.735 \\
+8P6X (CAK)  & 1.90 & 6.60 & No  & n/a   & 0.964 \\
+8P74 (CAK)  & 2.20 & 6.67 & No  & 0.628 & 0.793 \\
+8P71 (CAK)  & 2.00 & 7.02 & No  & 0.720 & 0.926 \\
+8P6W (CAK)  & 1.90 & 7.33 & No  & 0.762 & 0.929 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection*{Flexible-sidechain redocking does not rescue the 9L40 pose}
+
+Allowing the five active-site residues nearest the native berzosertib pose
+to move during docking did not recover it: mean symmetry-corrected RMSD
+across three seeds was $3.00\pm0.92$~{\AA} (individual seeds: $4.29$,
+$2.23$, $2.49$~{\AA}), marginally \emph{worse} than the fully rigid result
+($2.53$~{\AA}), and no seed passed the 2.0~{\AA} threshold. This argues
+against a simple rigid-conformer artifact -- if the failure were purely
+that the crystallized side-chain rotamers happened to occlude the correct
+pose, allowing them to relax should have helped, and it did not, even in
+the seed that came closest ($2.23$~{\AA}). It is consistent with either a
+genuinely less-supported deposited pose or a larger-scale conformational
+change (e.g., backbone motion, not captured by side-chain flexibility
+alone) that this low-compute test cannot distinguish.
+
+\subsection*{Using the excluded structure would have skewed the pilot
+screen}
+
+Docking the same 40-compound pilot set against 9L40 instead of 9L4B
+produced a materially different ranking: the Spearman rank correlation
+between the two receptors' scores across all 40 compounds is $\rho=0.19$
+($p=0.24$, not significant), and only 5 of the top-10 compounds by 9L4B
+score also appear in 9L40's top-10 (Table~\ref{tab:errorprop}). The mean
+absolute rank shift between the two receptors is 12.3 positions (out of
+40), with a maximum shift of 29 positions (\texttt{deriv\_022}: rank 7 by
+9L4B, rank 36 by 9L40). This is not a claim that 9L40's scores are
+``wrong'' in some absolute sense -- both are Vina scores against real,
+deposited coordinates -- but a direct demonstration that had the
+validation step been skipped and 9L40 used by default, the pilot screen
+would have prioritized a substantially different, and on the evidence
+above less trustworthy, set of compounds.
+
+\begin{table}[htbp]
+\centering
+\caption{Compounds with the largest rank shift between scoring against 9L4B (validated) and 9L40 (excluded), out of 40 pilot compounds.}
+\label{tab:errorprop}
+\small
+\begin{tabular}{lccc}
+\toprule
+Compound & Rank (9L40) & Rank (9L4B) & Rank shift \\
+\midrule
+deriv\_022 & 36 & 7  & 29 \\
+deriv\_010 & 11 & 39 & 28 \\
+deriv\_017 & 6  & 34 & 28 \\
+deriv\_015 & 13 & 38 & 25 \\
+deriv\_033 & 34 & 9  & 25 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \section*{Discussion}
 
 The central finding of this pilot is methodological rather than chemical:
@@ -476,25 +687,51 @@ candidate explanations are a genuinely less well-supported deposited pose
 comparable Q-score but lower residue inclusion than 9L4B) and a genuine
 limitation of rigid-receptor Vina docking against this particular
 conformational state (e.g., an induced-fit effect specific to the
-dimer-interface-engaged assembly). This pilot cannot fully separate those
-two remaining explanations, and does not attempt to; the practical
-implication for anyone reusing these structures is the same either way:
-validate before you screen. What it does establish, with the alternative
-explanations we could cheaply test now closed off, is that the effect is
-real and not an artifact of how it was measured.
+dimer-interface-engaged assembly). A third test, run in this round,
+weighs against the simplest version of the second explanation: allowing
+the five nearest active-site residues to move during docking did not
+rescue the pose (mean symmetry-corrected RMSD $3.00\pm0.92$~{\AA} across
+three seeds, versus $2.53$~{\AA} rigid -- if anything slightly worse, and
+no seed passed). If the failure were simply that the crystallized
+side-chain rotamers were blocking the correct pose, relaxing them should
+have helped; it did not. This does not resolve the deposited-pose-quality
+vs. conformational-change question -- five side chains are a much smaller
+perturbation than backbone motion or an induced-fit rearrangement, which
+this low-compute test cannot access -- but it does rule out the most
+easily-fixed version of a rigid-conformer artifact, and shifts the balance
+of evidence somewhat further toward the deposited pose itself, or a
+larger-scale conformational effect, rather than a simple side-chain
+clash.
 
-This finding rests on a single failing structure out of two tested, and a
-generalizable claim -- that structure-dependent docking reliability is
-common, or that it is unrelated to resolution -- would need a survey across
-many more recently deposited structures, not an anecdote from one. We do
-not make that broader claim here. What this pilot demonstrates is that the
-validate-before-screening control is inexpensive, automatable (the same
-script validated all three structures here), and caught a real,
-non-obvious failure on the very first pair of structures it was pointed
-at; turning that into a rate (what fraction of recent cryo-EM kinase
-depositions pass a standard redocking control, and does failure correlate
-with resolution, deposition year, or map-quality metrics) is the natural
-next study, using the same pipeline at a larger n.
+This finding no longer rests on a single failing structure out of two
+tested. Extending the identical, independently re-validated pipeline to 14
+additional recently deposited cryo-EM structures of an unrelated kinase
+system (CAK) found the same failure mode recurring at a similar rate
+(11/14, 79\%, vs. the ATR pair's 1/2), so structure-dependent redocking
+failure at $\leq$3.2~{\AA} resolution is not an ATR-specific or even a
+rare phenomenon in this sample -- it is closer to the norm than the
+exception. What did \emph{not} generalize is the hope, raised in the
+previous round of this work, that wwPDB map-model fit metrics (Q-score,
+residue inclusion) might explain or predict which structures fail: across
+17 structures, Q-score trends in the wrong direction (passing structures
+have \emph{lower}, not higher, mean Q-score) and residue inclusion shows
+no relationship at all. The 8P74/8P75 pair -- the same complex, the same
+bound inhibitor, one passing and one failing by a wide margin -- makes the
+same point without needing any correlation statistic: whatever determines
+redocking reliability here is specific to the individual deposited
+coordinate set, not a property of the target, the ligand, or (on this
+evidence) a single reported validation metric. The practical implication
+is therefore stronger, not weaker, than the previous round's: redocking
+validation is not a formality that a good enough map-quality score could
+substitute for, and per-structure empirical validation is not merely
+prudent but, on this evidence, close to necessary before any candidate is
+scored against a newly deposited structure -- cryo-EM or otherwise. This
+survey remains a sample of convenience (14 of the 17 structures come from
+one target's fragment-elaboration series, reachable via this session's
+network access, not a systematic or stratified sample of recent kinase
+depositions; see Limitations), and turning ``close to necessary'' into a
+precise, generalizable failure rate would need a larger, more
+deliberately sampled follow-up.
 
 The pilot docking result is, appropriately for a 35-derivative pilot,
 modest rather than dramatic: no generated derivative exceeded the predicted
@@ -519,12 +756,21 @@ compounds is an open question this pilot's scale cannot answer.
 
 This is a small pilot, and its scope was set by what could be executed
 directly and verifiably, not by what would be most impressive to report.
-Specifically: (1) the central reliability finding rests on \textbf{n=1}
-failing structure out of two tested; it demonstrates that the
-validate-before-screening control is necessary and can catch a real,
-non-obvious failure, but a claim about how \emph{common} such failures are,
-or what they correlate with, would need a survey across many more
-structures (Discussion) and is not made here; (2) the BRICS recombination
+Specifically: (1) the multi-structure survey (n=17) that extends the
+central reliability finding is a sample of convenience, not a systematic
+or stratified one: 14 of the 17 structures come from a single target's
+(CAK) fragment-elaboration series, all deposited by the same
+research group within a narrow time window, reachable through this
+session's network access rather than selected to represent recent kinase
+depositions broadly; a single congeneric series sharing one scaffold and
+one binding mode is not independent evidence in the way 14 unrelated
+targets would be, and the true, structure-independent failure rate could
+differ substantially from the 82\% observed here; (1a) the Q-score/residue
+inclusion correlation analysis is likewise underpowered by a
+pass-group-starved sample (2--3 passing structures of 17) and should be
+read as a negative result on this sample, not a general refutation that
+any map-quality metric could ever predict redocking reliability;
+(2) the BRICS recombination
 cap (5,000) is combinatorial, not principled, and a larger or differently
 seeded run would sample a different, likely larger, region of the
 accessible chemical space; (3) the 40-compound pilot library is a small,
@@ -562,11 +808,32 @@ reproduced the expected top rank of the receptor's own native ligand and
 generated interpretable, if modest, analogs of it, without yet surfacing a
 chemotype that improves on the seed compounds -- a realistic, honestly
 reported outcome for a pilot of this scale, and one further reason to treat
-larger claims from similarly small screens with caution. The natural next
-step is the same pipeline at a larger n: a survey of redocking pass rates
-across recently deposited structures would turn this single, real finding
-into a rate. All structures, code, and intermediate data used in this
-study are openly available for independent verification and reuse.
+larger claims from similarly small screens with caution.
+
+Extending the same pipeline to a larger, if still convenience-sampled, set
+of 17 structures across two unrelated kinase targets turned this single
+finding into a rate: 14/17 (82\%) fail redocking at resolutions
+(1.8--3.2~{\AA}) that would ordinarily be considered more than adequate,
+and the failure recurs whether or not the target is ATR. It also closed
+off, rather than confirmed, the most convenient available explanation:
+wwPDB Q-score and residue inclusion do not predict which structures will
+fail, and in the case of Q-score trend mildly the wrong way. A
+flexible-sidechain redocking test -- a low-compute stand-in for molecular
+dynamics -- did not rescue the 9L40 pose either, arguing against the
+simplest rigid-conformer explanation. And docking the same pilot library
+against the excluded structure instead of the validated one produced a
+substantially different, and by the evidence above less trustworthy,
+compound ranking, demonstrating concretely what validation prevents.
+Together these results shift the paper's central claim from ``run this
+control, it caught one real problem'' to ``run this control: on the
+evidence gathered here, more recently deposited kinase structures fail a
+basic redocking check than pass it, no cheap validation-report metric
+reliably flags which ones will, and the difference this makes to a
+downstream screen is large.'' A systematic, stratified survey across many
+independent targets -- not the convenience sample assembled here -- is
+the natural next step to turn ``82\% in this sample'' into a
+field-general rate. All structures, code, and intermediate data used in
+this study are openly available for independent verification and reuse.
 
 \section*{Declaration of AI assistance}
 Portions of this study's code, analysis, and manuscript drafting were
