@@ -53,6 +53,12 @@ EXCLUDE_RESNAMES = {
     "TAM", "BEZ", "1PE", "PEO", "P6G", "MES", "MRD", "BOG", "OCT", "NH4",
     "CO3", "NO3", "AZI", "SCN", "UNX", "UNL", "PEG2", "PEG3", "PEG4",
     "PE4", "P33", "PLM", "MYR", "OLA", "STE", "12P", "15P", "1PG",
+    # Glycosylation sugars -- covalently attached N-/O-linked glycans, not
+    # a freely-bound small-molecule ligand of pharmacological interest.
+    # Missing this category caused a real mispick on 3dx1 (NAG selected
+    # over the actual bound inhibitor YHO) -- found and fixed this round.
+    "NAG", "NDG", "MAN", "BMA", "FUC", "FUL", "GAL", "GLA", "GLC", "BGC",
+    "XYL", "XYS", "SIA", "NAN", "A2G", "FCA",
 }
 
 

@@ -1,0 +1,26 @@
+{
+  "pdbid": "2w4x",
+  "resolution": 2.42,
+  "ligand_comp_id": "STZ",
+  "ligand_copy_used": "A1591_STZ",
+  "ligand_n_heavy_atoms": 18,
+  "n_candidates_considered": 1,
+  "box_center": [
+    -8.386722564697266,
+    -10.949832916259766,
+    9.249500274658203
+  ],
+  "symm_rmsd_values": [
+    1.660498034392761,
+    1.6688520505625015,
+    1.6799384909374908
+  ],
+  "symm_rmsd_mean": 1.6697628586309177,
+  "symm_rmsd_std": 0.007962621685935782,
+  "vina_scores": [
+    -5.857,
+    -5.873,
+    -5.84
+  ],
+  "passes_2.0A": true
+}

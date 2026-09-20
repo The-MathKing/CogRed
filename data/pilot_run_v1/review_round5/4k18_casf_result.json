@@ -1,0 +1,26 @@
+{
+  "pdbid": "4k18",
+  "resolution": 2.05,
+  "ligand_comp_id": "1OB",
+  "ligand_copy_used": "A402_1OB",
+  "ligand_n_heavy_atoms": 29,
+  "n_candidates_considered": 1,
+  "box_center": [
+    -19.07362174987793,
+    -35.43192672729492,
+    2.5634138584136963
+  ],
+  "symm_rmsd_values": [
+    4.522215630296343,
+    4.47074034214654,
+    4.514519992050173
+  ],
+  "symm_rmsd_mean": 4.502491988164351,
+  "symm_rmsd_std": 0.022670553303559743,
+  "vina_scores": [
+    -9.934,
+    -9.968,
+    -9.936
+  ],
+  "passes_2.0A": false
+}

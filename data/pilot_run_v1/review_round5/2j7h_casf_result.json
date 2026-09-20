@@ -1,0 +1,26 @@
+{
+  "pdbid": "2j7h",
+  "resolution": 1.95,
+  "ligand_comp_id": "AZF",
+  "ligand_copy_used": "A1446_AZF",
+  "ligand_n_heavy_atoms": 10,
+  "n_candidates_considered": 2,
+  "box_center": [
+    -1.2654999494552612,
+    10.717400550842285,
+    8.865399360656738
+  ],
+  "symm_rmsd_values": [
+    9.341084942339407,
+    9.3751308577534,
+    9.36333751928232
+  ],
+  "symm_rmsd_mean": 9.359851106458374,
+  "symm_rmsd_std": 0.014116123048448444,
+  "vina_scores": [
+    -4.602,
+    -4.61,
+    -4.605
+  ],
+  "passes_2.0A": false
+}

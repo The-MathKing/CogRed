@@ -77,13 +77,20 @@ better, but no seed passed the $2.0$~{\AA} threshold. Docking the same 40-compou
 structure instead of the validated 9L4B produced a substantially different
 ranking (Spearman $\rho=0.19$, $p=0.24$ between the two receptors' scores;
 only 5/10 compounds shared between the two top-10 lists), demonstrating
-concretely what is lost by skipping the validation step.
-\textbf{Conclusions:} A newly deposited, high-resolution structure is not
-automatically a reliable docking receptor; this can only be established
-empirically, per structure and per protocol, before any candidate is
-scored, and -- at least in this $n=17$ sample -- cannot be substituted for
-by a map-model fit metric alone. All code, data, and structures are openly
-available.
+concretely what is lost by skipping the validation step. Because the CAK
+failure rate is far below AutoDock Vina's documented self-docking success
+rate on curated benchmarks (58\% on the 285-complex PDBbind Core Set), the
+identical, unmodified pipeline was additionally run as a positive control
+on 20 objectively selected, unrelated CASF-2016 complexes: it passed 8/20
+(40\%), statistically indistinguishable from the literature baseline
+($p=0.08$) -- ruling out a badly broken pipeline -- while the CAK rate
+remains a significant outlier even against this pipeline's own measured
+40\% baseline ($p=0.008$). \textbf{Conclusions:} A newly deposited,
+high-resolution structure is not automatically a reliable docking
+receptor; this can only be established empirically, per structure and per
+protocol, before any candidate is scored, and -- at least in this $n=17$
+sample -- cannot be substituted for by a map-model fit metric alone. All
+code, data, and structures are openly available.
 \end{abstract}
 
 \noindent\textbf{Keywords:} ATR kinase; molecular docking; redocking
@@ -702,6 +709,62 @@ on its own, to rescue the pose, so a genuinely less-supported deposited
 pose or a larger-scale conformational change beyond five side chains
 remains at least as plausible an explanation as before.
 
+\subsection*{Positive-control validation: the pipeline is not badly
+broken, and the CAK finding survives}
+
+The CAK failure rate (13/14, 93\%) is far below AutoDock Vina's
+documented self-docking success rate on the 285-complex PDBbind Core Set
+(58\%, \citep{zhang2023}), which by itself is compatible with either a
+genuine property of the CAK structure series or an undetected problem in
+this pipeline's receptor/ligand preparation. The positive control
+(Methods) distinguishes these directly: the same, completely unmodified
+pipeline, run on 20 objectively selected (first 20 in file order, not
+inspected before selection), unrelated CASF-2016 complexes, passed
+8/20 (40\%). One structure's automated ligand selection was a genuine
+bug caught while reviewing this batch: 3DX1's largest non-excluded
+heteroatom group was initially a glycosylation sugar (NAG) rather than
+the deposited inhibitor (YHO), because glycans were not on the original
+exclusion list; fixed by adding a glycan-code exclusion category and
+re-run (the corrected result, $3.29$~{\AA} against the real ligand, still
+fails, so this bug did not affect the pass/fail count, but it would have
+been a real error in Table~\ref{tab:casf} had it gone unnoticed).
+
+Two comparisons follow from this 40\% figure, and they point in different
+directions on different questions. Against the literature's 58\% Vina
+baseline, this pipeline's own 40\% is not a significant departure
+(one-sided binomial $p=0.08$, $n=20$) -- consistent with a real but
+modest performance gap expected from a simpler, generic protocol (a
+single fixed 22~{\AA} box regardless of ligand size, Open Babel/Gasteiger
+partial charges rather than a more sophisticated charge model, no local
+search refinement), not with a broken pipeline. Against \emph{this same
+pipeline's own} empirically measured $40\%$ baseline, however, the CAK
+result remains a significant outlier: 1/14 passing is far fewer than the
+$\sim$5.6 expected at 40\% (one-sided binomial $p=0.008$), while the
+original ATR pair's 1/2 is entirely consistent with a 40\% baseline
+($p=0.84$). The pipeline, in other words, is doing about what a
+generic, non-tuned Vina protocol should be expected to do on an
+unrelated, unbiased benchmark -- and the CAK series still fails far more
+than that baseline would predict. The 13/14 CAK failure rate, and every
+claim in this paper built on it, is treated as established rather than
+provisional from this point on.
+
+\begin{table}[htbp]
+\centering
+\caption{Positive-control validation: the unmodified pipeline applied to 20 objectively selected CASF-2016 core-set complexes, compared to its performance on the CAK survey and the original ATR pair.}
+\label{tab:casf}
+\small
+\begin{tabular}{lccc}
+\toprule
+Set & $n$ & Pass & Pass rate \\
+\midrule
+CASF-2016 subset (positive control) & 20 & 8 & 40\% \\
+CAK survey & 14 & 1 & 7\% \\
+ATR pair (9L40/9L4B) & 2 & 1 & 50\% \\
+Literature Vina baseline \citep{zhang2023} & 285 & -- & 58\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \subsection*{Using the excluded structure would have skewed the pilot
 screen}
 
@@ -862,10 +925,12 @@ property of this structure series, or a symptom of a receptor/ligand
 preparation issue specific to this pipeline's handling of the CAK
 complex? A positive-control redocking run of this same, unmodified
 pipeline against an independent, externally-curated benchmark set
-(Methods) is the direct way to distinguish these and is in progress; the
-13/14 figure and every claim built on it in this draft should be treated
-as provisional until that control is complete, and is reported below if
-it finished in time for this version, or flagged as outstanding if not.
+(Methods, Results) answers this directly: the pipeline's own measured
+performance on that benchmark (40\%) is statistically indistinguishable
+from the literature Vina baseline (58\%, $p=0.08$), so it is not badly
+broken, while the CAK rate remains a significant outlier even against the
+pipeline's own 40\% baseline ($p=0.008$). The 13/14 figure is treated as
+established, not provisional, on that basis.
 
 This survey remains a sample of convenience regardless of that outcome
 (14 of the 17 structures come from one target's fragment-elaboration
@@ -917,7 +982,18 @@ version is reported here, but this stands as a reminder that every
 comparison in this pilot needs its confounds enumerated before, not after,
 a reviewer catches them, and that the same risk could apply to comparisons
 elsewhere in this paper that have not been independently attacked as hard
-as this one was; (2) the BRICS recombination
+as this one was; (1c) the CASF-2016 positive control used 20 of 285
+complexes, an objectively selected but still small subset, and its own
+ligand-of-interest detection (the largest non-excluded heteroatom group)
+is a heuristic that produced one confirmed mispick (3DX1: a glycosylation
+sugar selected over the real ligand, caught and fixed this round, Results)
+and could in principle produce others undetected in the remaining 19; the
+$40\%$ pipeline baseline this control establishes should be read with
+that heuristic's imperfection in mind, though the specific 8P74/8P75- and
+3DX1-type errors this paper has now found and corrected were all caught
+by manually reading structure titles and entity lists, not by the
+heuristic itself, so this is a real but partial safeguard, not a
+complete one; (2) the BRICS recombination
 cap (5,000) is combinatorial, not principled, and a larger or differently
 seeded run would sample a different, likely larger, region of the
 accessible chemical space; (3) the 40-compound pilot library is a small,
@@ -959,31 +1035,49 @@ larger claims from similarly small screens with caution.
 
 Extending the same pipeline to a larger, if still convenience-sampled, set
 of 17 structures across two unrelated kinase targets turned this single
-finding into a rate: 14/17 (82\%) fail redocking at resolutions
-(1.8--3.2~{\AA}) that would ordinarily be considered more than adequate,
-and the failure recurs whether or not the target is ATR. It also closed
-off, rather than confirmed, the most convenient available explanation:
-wwPDB Q-score and residue inclusion do not predict which structures will
-fail, and in the case of Q-score trend mildly the wrong way. A
-flexible-sidechain redocking test -- a low-compute stand-in for molecular
-dynamics -- improved the 9L40 pose relative to a properly matched rigid
-control, but not enough to rescue it, evidence for a partial
-rigid-conformer contribution rather than against one, and a correction
-to this paper's own first, confounded reading of that experiment. And
-docking the same pilot library
-against the excluded structure instead of the validated one produced a
-substantially different, and by the evidence above less trustworthy,
-compound ranking, demonstrating concretely what validation prevents.
+finding into a rate: 14/17 (82\%) overall, and 13/14 (93\%) within the
+CAK series specifically, fail redocking at resolutions (1.8--3.2~{\AA})
+that would ordinarily be considered more than adequate, and the failure
+recurs whether or not the target is ATR. Because that rate is far below
+AutoDock Vina's documented performance on curated benchmarks, it was not
+taken at face value: the identical, unmodified pipeline was run as a
+positive control on 20 objectively selected CASF-2016 complexes,
+passing 8/20 (40\%) -- statistically indistinguishable from the
+literature's 58\% baseline, ruling out a badly broken pipeline, while the
+CAK rate remains a significant outlier even against this pipeline's own
+measured 40\% baseline ($p=0.008$). This survey also closed off, rather
+than confirmed, the most convenient available explanation for the
+original finding: wwPDB Q-score and residue inclusion do not predict
+which structures will fail, and in the case of Q-score trend mildly the
+wrong way. A flexible-sidechain redocking test -- a low-compute stand-in
+for molecular dynamics -- improved the 9L40 pose relative to a properly
+matched rigid control, but not enough to rescue it, evidence for a partial
+rigid-conformer contribution rather than against one, and a correction to
+this paper's own first, confounded reading of that experiment. And
+docking the same pilot library against the excluded structure instead of
+the validated one produced a substantially different, and by the evidence
+above less trustworthy, compound ranking, demonstrating concretely what
+validation prevents. One further correction belongs here because it
+changed a claim rather than just refining it: an earlier reading of two
+CAK structures (8P74/8P75) as independent evidence of coordinate-set-specific
+unpredictability did not survive checking their own deposition titles,
+which identify them as deliberately separated conformer models of one
+flexible ligand -- withdrawn on that basis, without weakening the
+survey's overall rate, which does not depend on that pair.
+
 Together these results shift the paper's central claim from ``run this
 control, it caught one real problem'' to ``run this control: on the
 evidence gathered here, more recently deposited kinase structures fail a
-basic redocking check than pass it, no cheap validation-report metric
-reliably flags which ones will, and the difference this makes to a
-downstream screen is large.'' A systematic, stratified survey across many
-independent targets -- not the convenience sample assembled here -- is
-the natural next step to turn ``82\% in this sample'' into a
-field-general rate. All structures, code, and intermediate data used in
-this study are openly available for independent verification and reuse.
+basic redocking check than pass it at a rate this pipeline's own
+positive-control performance cannot explain away, no cheap
+validation-report metric reliably flags which ones will, and the
+difference this makes to a downstream screen is large.'' A systematic,
+stratified survey across many independent targets -- not the convenience
+sample assembled here -- is the natural next step to turn ``93\% in one
+congeneric series'' into a field-general rate. All structures, code, and
+intermediate data used in this study are openly available for independent
+verification and reuse, including the positive-control validation and
+every correction made in response to external review.
 
 \section*{Declaration of AI assistance}
 Portions of this study's code, analysis, and manuscript drafting were

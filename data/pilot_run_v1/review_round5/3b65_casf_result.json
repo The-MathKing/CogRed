@@ -1,0 +1,26 @@
+{
+  "pdbid": "3b65",
+  "resolution": 1.8,
+  "ligand_comp_id": "3B6",
+  "ligand_copy_used": "A1_3B6",
+  "ligand_n_heavy_atoms": 25,
+  "n_candidates_considered": 1,
+  "box_center": [
+    28.073843002319336,
+    2.419679641723633,
+    5.805999755859375
+  ],
+  "symm_rmsd_values": [
+    0.48603752941516754,
+    0.4870602837431931,
+    0.48864543382702336
+  ],
+  "symm_rmsd_mean": 0.48724774899512796,
+  "symm_rmsd_std": 0.0010728929026566523,
+  "vina_scores": [
+    -9.237,
+    -9.261,
+    -9.204
+  ],
+  "passes_2.0A": true
+}

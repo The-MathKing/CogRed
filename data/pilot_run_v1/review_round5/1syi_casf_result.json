@@ -1,0 +1,26 @@
+{
+  "pdbid": "1syi",
+  "resolution": 2.1,
+  "ligand_comp_id": "CPW",
+  "ligand_copy_used": "A381_CPW",
+  "ligand_n_heavy_atoms": 17,
+  "n_candidates_considered": 2,
+  "box_center": [
+    20.668060302734375,
+    13.022883415222168,
+    58.008766174316406
+  ],
+  "symm_rmsd_values": [
+    11.802329882148642,
+    11.842284539633686,
+    11.826832503203194
+  ],
+  "symm_rmsd_mean": 11.82381564166184,
+  "symm_rmsd_std": 0.016450324289743103,
+  "vina_scores": [
+    -5.548,
+    -5.541,
+    -5.597
+  ],
+  "passes_2.0A": false
+}

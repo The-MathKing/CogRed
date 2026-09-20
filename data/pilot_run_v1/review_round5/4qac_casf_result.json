@@ -1,0 +1,26 @@
+{
+  "pdbid": "4qac",
+  "resolution": 1.91,
+  "ligand_comp_id": "KK3",
+  "ligand_copy_used": "A304_KK3",
+  "ligand_n_heavy_atoms": 24,
+  "n_candidates_considered": 19,
+  "box_center": [
+    -50.89508056640625,
+    -46.82054138183594,
+    30.846166610717773
+  ],
+  "symm_rmsd_values": [
+    0.5252448635319217,
+    0.5617219804612712,
+    0.5207247353448845
+  ],
+  "symm_rmsd_mean": 0.5358971931126925,
+  "symm_rmsd_std": 0.01835388461890827,
+  "vina_scores": [
+    -10.962,
+    -10.948,
+    -10.953
+  ],
+  "passes_2.0A": true
+}

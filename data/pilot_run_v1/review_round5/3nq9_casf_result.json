@@ -1,0 +1,26 @@
+{
+  "pdbid": "3nq9",
+  "resolution": 1.9,
+  "ligand_comp_id": "OCA",
+  "ligand_copy_used": "A1111_OCA",
+  "ligand_n_heavy_atoms": 10,
+  "n_candidates_considered": 1,
+  "box_center": [
+    -4.647399425506592,
+    -5.697700023651123,
+    -17.52859878540039
+  ],
+  "symm_rmsd_values": [
+    5.65983285972298,
+    9.87276808701592,
+    6.061858502142723
+  ],
+  "symm_rmsd_mean": 7.198153149627207,
+  "symm_rmsd_std": 1.8983466405915566,
+  "vina_scores": [
+    -4.842,
+    -4.933,
+    -4.967
+  ],
+  "passes_2.0A": false
+}

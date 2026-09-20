@@ -1,0 +1,26 @@
+{
+  "pdbid": "2cet",
+  "resolution": 1.97,
+  "ligand_comp_id": "PGI",
+  "ligand_copy_used": "A1447_PGI",
+  "ligand_n_heavy_atoms": 22,
+  "n_candidates_considered": 2,
+  "box_center": [
+    -0.6183180809020996,
+    9.064318656921387,
+    10.290045738220215
+  ],
+  "symm_rmsd_values": [
+    7.7525819863156205,
+    7.736742070383138,
+    7.741968583342
+  ],
+  "symm_rmsd_mean": 7.74376421334692,
+  "symm_rmsd_std": 0.006590091022282494,
+  "vina_scores": [
+    -8.665,
+    -8.615,
+    -8.621
+  ],
+  "passes_2.0A": false
+}

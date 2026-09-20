@@ -1,0 +1,26 @@
+{
+  "pdbid": "3arq",
+  "resolution": 1.5,
+  "ligand_comp_id": "DM5",
+  "ligand_copy_used": "A606_DM5",
+  "ligand_n_heavy_atoms": 36,
+  "n_candidates_considered": 1,
+  "box_center": [
+    18.708663940429688,
+    -10.934887886047363,
+    21.48644256591797
+  ],
+  "symm_rmsd_values": [
+    3.1996612494311187,
+    3.208142007282235,
+    3.1914204996451896
+  ],
+  "symm_rmsd_mean": 3.1997412521195145,
+  "symm_rmsd_std": 0.006826761298329477,
+  "vina_scores": [
+    -13.388,
+    -13.394,
+    -13.353
+  ],
+  "passes_2.0A": false
+}

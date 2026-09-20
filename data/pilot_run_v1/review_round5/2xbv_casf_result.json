@@ -1,0 +1,26 @@
+{
+  "pdbid": "2xbv",
+  "resolution": 1.66,
+  "ligand_comp_id": "XBV",
+  "ligand_copy_used": "A1245_XBV",
+  "ligand_n_heavy_atoms": 36,
+  "n_candidates_considered": 1,
+  "box_center": [
+    9.944860458374023,
+    63.89558792114258,
+    3.687166929244995
+  ],
+  "symm_rmsd_values": [
+    1.0321496849886753,
+    1.0493835492008308,
+    1.0399341458851024
+  ],
+  "symm_rmsd_mean": 1.0404891266915361,
+  "symm_rmsd_std": 0.007046631426546328,
+  "vina_scores": [
+    -11.104,
+    -11.065,
+    -11.091
+  ],
+  "passes_2.0A": true
+}

@@ -1,0 +1,26 @@
+{
+  "pdbid": "3dx1",
+  "resolution": 1.21,
+  "ligand_comp_id": "YHO",
+  "ligand_copy_used": "A1050_YHO",
+  "ligand_n_heavy_atoms": 9,
+  "n_candidates_considered": 1,
+  "box_center": [
+    32.05955505371094,
+    66.08833312988281,
+    8.10344409942627
+  ],
+  "symm_rmsd_values": [
+    3.310093855668346,
+    3.273772899881725,
+    3.293985158166658
+  ],
+  "symm_rmsd_mean": 3.292617304572243,
+  "symm_rmsd_std": 0.014859480136829391,
+  "vina_scores": [
+    -4.205,
+    -4.224,
+    -4.214
+  ],
+  "passes_2.0A": false
+}

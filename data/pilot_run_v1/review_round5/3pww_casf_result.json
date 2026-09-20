@@ -1,0 +1,26 @@
+{
+  "pdbid": "3pww",
+  "resolution": 1.22,
+  "ligand_comp_id": "ROC",
+  "ligand_copy_used": "A1001_ROC",
+  "ligand_n_heavy_atoms": 49,
+  "n_candidates_considered": 1,
+  "box_center": [
+    -1.5081630945205688,
+    4.805367469787598,
+    9.185796737670898
+  ],
+  "symm_rmsd_values": [
+    1.686934304274703,
+    1.7456106995220082,
+    1.7894197725656715
+  ],
+  "symm_rmsd_mean": 1.7406549254541275,
+  "symm_rmsd_std": 0.041986010171355025,
+  "vina_scores": [
+    -9.993,
+    -10.11,
+    -10.036
+  ],
+  "passes_2.0A": true
+}

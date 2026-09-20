@@ -1,0 +1,26 @@
+{
+  "pdbid": "3kwa",
+  "resolution": 2.0,
+  "ligand_comp_id": "SPM",
+  "ligand_copy_used": "A300_SPM",
+  "ligand_n_heavy_atoms": 14,
+  "n_candidates_considered": 1,
+  "box_center": [
+    -4.577785491943359,
+    3.3800716400146484,
+    15.232999801635742
+  ],
+  "symm_rmsd_values": [
+    3.361079174057897,
+    3.375213104383189,
+    3.5037416530658443
+  ],
+  "symm_rmsd_mean": 3.4133446438356434,
+  "symm_rmsd_std": 0.06418024854493173,
+  "vina_scores": [
+    -3.86,
+    -3.902,
+    -3.69
+  ],
+  "passes_2.0A": false
+}
