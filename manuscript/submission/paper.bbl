@@ -1,4 +1,4 @@
-\begin{thebibliography}{21}
+\begin{thebibliography}{22}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
@@ -140,5 +140,14 @@ Victoria~I. Cushing, Ai~Fang Koh, Jing Feng, Kotryna Jurgaityte, Alexander
   structure-based drug design.
 \newblock \emph{Nature Communications}, 15:\penalty0 2265, 2024.
 \newblock \doi{10.1038/s41467-024-46375-9}.
+
+\bibitem[R{\"o}hrig et~al.(2023)R{\"o}hrig, Goullieux, Bugnon, and
+  Zoete]{zhang2023}
+Ute~F. R{\"o}hrig, Ma\"ite Goullieux, Matthieu Bugnon, and Vincent Zoete.
+\newblock Attracting cavities 2.0: Improving the flexibility and robustness for
+  small-molecule docking.
+\newblock \emph{Journal of Chemical Information and Modeling}, 63\penalty0
+  (12):\penalty0 3925--3940, 2023.
+\newblock \doi{10.1021/acs.jcim.3c00054}.
 
 \end{thebibliography}
