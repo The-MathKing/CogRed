@@ -7,6 +7,8 @@
 \usepackage{booktabs}
 \usepackage{array}
 \usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\usepackage{xurl}
+\usepackage{microtype}
 \usepackage{caption}
 \usepackage{setspace}
 \usepackage[round,numbers,sort&compress]{natbib}
@@ -16,9 +18,9 @@
 
 \title{\Large Redocking Failure Is Common Across Recent Kinase Structures and Is Not Predicted by Map-Quality Metrics: A Validated Survey of ATR/CHK1 and CDK-Activating Kinase}
 
-\author{[Author name(s) to be added]\\[2pt]
-\small [Affiliation to be added]\\[2pt]
-\small Correspondence: [email to be added]}
+\author{Ethan Ye$^{1}$, Aryan Padarthi$^{1}$, Sungju Kim$^{1}$, Alexandre Elie-Dit-Cosaque$^{1}$\\[4pt]
+\small $^{1}$Allen High School, Allen ISD, Allen, TX 75013, USA\\[2pt]
+\small Correspondence: ethan.ye@student.allenisd.org, aryan.padarthi@student.allenisd.org}
 \date{}
 
 \begin{document}
@@ -400,29 +402,28 @@ allowing five active-site residues within 4.5~{\AA} of the native
 berzosertib pose (chain A: LYS2327, TYR2365, GLU2378, TRP2379, HIS2477) to
 move during docking while the remainder of the receptor stayed rigid.
 Rigid and flexible receptor parts were prepared with Meeko
-(\texttt{mk\_prepare\_receptor.py}), which required an explicit histidine
+(\path{mk_prepare_receptor.py}), which required an explicit histidine
 tautomer assignment for HIS2477 (HIE) and automatic removal of $\sim$400
 residues elsewhere in the structure whose side-chain density could not be
 template-matched (typical of a $\sim$3~{\AA} cryo-EM map in surface/loop
 regions; none of the five target flexible residues were among those
 removed). The ligand was likewise prepared with Meeko
-(\texttt{mk\_prepare\_ligand.py}, requiring explicit hydrogens) for
+(\path{mk_prepare_ligand.py}, requiring explicit hydrogens) for
 atom-typing consistency with the Meeko-prepared flexible receptor; mixing
-an Open Babel-typed ligand with a Meeko-typed flexible receptor caused
-Vina's native C++ layer to abort rather than dock. The docking box was
+an Open Babel-prepared ligand with a Meeko-prepared flexible receptor caused
+Vina's native layer to abort rather than dock. The docking box was
 enlarged from 22~{\AA} (rigid redocking) to 30~{\AA} to give the flexible
 side chains room to explore alternate rotamers without a
 ligand-outside-box error; three seeded replicates (1000, 1001, 1002,
-exhaustiveness 32, matching the rigid redocking protocol) were run, each
-in its own subprocess (running multiple flexible-docking \texttt{Vina}
-instances within one Python process triggered an unrelated native crash
-traced to import order between the \texttt{vina} and \texttt{spyrmsd}
-packages, not to the docking itself). Because the flexible run differs
-from the original rigid redocking result in three ways at once (side-chain
-flexibility, a larger 30~{\AA} vs. 22~{\AA} box, and Meeko's automatic
-removal of $\sim$400 template-unmatched residues from the receptor), a
-matched control was additionally run: fully rigid redocking (no residues
-declared flexible) with the same 30~{\AA} box and the same
+exhaustiveness 32, matching the rigid protocol) were run in separate
+subprocesses (concurrent in-process flexible Vina instances triggered a
+crash traced to package import order between \texttt{vina} and
+\texttt{spyrmsd}, not to docking itself). Because the flexible run
+differs from the original rigid redocking result in three ways at once
+(side-chain flexibility, a larger 30~{\AA} vs. 22~{\AA} box, and Meeko's
+automatic removal of $\sim$400 template-unmatched residues from the
+receptor), a matched control was additionally run: fully rigid redocking
+(no residues declared flexible) with the same 30~{\AA} box and the same
 Meeko-prepared receptor and ligand, isolating the effect of flexibility
 alone from the other two changes.
 
@@ -504,12 +505,13 @@ artifact of the exhaustiveness setting used for validation.
 
 \begin{table}[htbp]
 \centering
-\caption{Redocking validation across three independent seeded Vina replicates (exhaustiveness 32). Resolution taken directly from each structure's mmCIF record: the \texttt{\_em\_3d\_reconstruction.resolution} field for the two cryo-EM structures (9L40, 9L4B), or \texttt{\_reflns.d\_resolution\_high} for the X-ray structure (2YM8).}
-\label{tab:redocking}
 \small
-\begin{tabular}{lcccccc}
+\setlength{\tabcolsep}{4pt}
+\caption{Redocking validation across three independent seeded Vina replicates (exhaustiveness 32). Resolution values are from mmCIF records (\texttt{\_em\_3d\_}\allowbreak\texttt{reconstruction.resolution} for cryo-EM, \texttt{\_reflns.d\_}\allowbreak\texttt{resolution\_high} for X-ray).}
+\label{tab:redocking}
+\begin{tabular}{@{}lccccc@{}}
 \toprule
-Structure & Resolution ({\AA}) & Naive RMSD ({\AA}) & Symm. RMSD ({\AA}) & Passes $\leq$2.0~{\AA} & Search repro. ({\AA}) \\
+Structure & Res. ({\AA}) & Naive RMSD ({\AA}) & Symm. RMSD ({\AA}) & Pass ($\leq$2.0~{\AA}) & Repro. ({\AA}) \\
 \midrule
 9L40 (ATR, VE-822)      & 2.87 & $2.96 \pm 0.06$ & $2.53 \pm 0.01$ & \textbf{No} (all 3) & $0.56$ \\
 9L4B (ATR, camonsertib) & 3.20 & $0.61 \pm 0.02$ & $0.61 \pm 0.02$ & Yes (all 3)         & $0.045$ \\
@@ -520,7 +522,7 @@ Structure & Resolution ({\AA}) & Naive RMSD ({\AA}) & Symm. RMSD ({\AA}) & Passe
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\textwidth]{figure_redocking_overlay.png}
+\includegraphics[width=0.88\linewidth]{figure_redocking_overlay.png}
 \caption{Native (crystal, grey) vs. redocked (colored) best pose. (A) 9L40/berzosertib: the isopropylsulfonylphenyl and aminomethylphenyl termini are visibly displaced/rotated relative to the native pose (symmetry-corrected RMSD 2.53~{\AA}). (B) 9L4B/camonsertib: near-complete overlay (symmetry-corrected RMSD 0.61~{\AA}).}
 \label{fig:overlay}
 \end{figure}
@@ -545,28 +547,26 @@ The 40-compound pilot set (5 seeds + 35 developability-passed derivatives)
 was docked against 9L4B (exhaustiveness 16, three seeded replicates each;
 Methods discusses the exhaustiveness used for validation vs. screening).
 Best-pose predicted affinity across the set ranged from $-9.80$ to
-$-7.82$~kcal/mol; leading with the more robust statistic, mean affinity
-(across 3 replicates) across all 40 compounds was $-8.66\pm0.45$~kcal/mol.
+$-7.82$ kcal/mol; leading with the more robust statistic, mean affinity
+(across 3 replicates) across all 40 compounds was $-8.66\pm0.45$ kcal/mol.
 Table~\ref{tab:docking} shows the top 10 ranked compounds by mean affinity.
 Camonsertib -- the receptor's own co-crystallized ligand -- ranked first,
 as expected for a structure the receptor was solved with. No BRICS
 derivative exceeded the best seed compound's predicted affinity; the
-closest, \texttt{deriv\_002} ($-9.46\pm0.01$~kcal/mol), came within
-$0.32$~kcal/mol of camonsertib -- a gap well within Vina's reported
-absolute error against experiment (commonly cited at 2--3~kcal/mol), so
+closest, \path{deriv_002} ($-9.46\pm0.01$ kcal/mol), came within
+$0.32$ kcal/mol of camonsertib -- a gap well within Vina's reported
+absolute error against experiment (commonly cited at 2--3 kcal/mol), so
 this ranking should be read as indistinguishable rather than as a
-near-miss. The three top-ranked derivatives (\texttt{deriv\_002},
-\texttt{deriv\_003}, \texttt{deriv\_019}) share camonsertib's
-oxabicyclic-ether/pyrazolopyrazine core with a single substituent varied
-(methylamino, methoxy, and dimethylamino respectively, in place of
-camonsertib's own morpholine substituent) -- an interpretable and expected
-outcome of BRICS recombination re-using the best-scoring seed compound's
-own fragments in a new context, rather than an independent discovery of
-novel chemical matter. The 35-derivative subset was selected by rule count
-then molecular weight ascending (Methods), which systematically favors
-smaller ligands -- themselves typically weaker Vina scorers -- so the
-pilot set is, by its own selection rule, stacked against derivatives
-beating the (larger) seed compounds.
+near-miss. The three top-ranked derivatives (\path{deriv_002},
+\path{deriv_003}, and \path{deriv_019}) share camonsertib's core
+scaffold with a single substituent varied (methylamino, methoxy, or
+dimethylamino in place of morpholine) -- an expected outcome of BRICS
+recombination re-using the best-scoring seed compound's fragments in a new
+context, rather than discovery of novel chemical matter. The 35-derivative
+subset was selected by rule count then molecular weight ascending (Methods),
+which systematically favors smaller ligands -- themselves typically weaker
+Vina scorers -- so the pilot set is, by its own selection rule, stacked
+against derivatives beating the (larger) seed compounds.
 
 \begin{table}[htbp]
 \centering
@@ -917,7 +917,10 @@ setup error would produce (a mispositioned or oversized box ejecting the
 ligand from the site entirely, which would show large centroid shifts) and
 is more consistent with either an orientational degeneracy in this
 scaffold's hinge-binding mode or a receptor/ligand-preparation effect that
-biases pose orientation without moving the ligand out of the site -- a
+biases pose orientation without moving the ligand out of the site (for instance,
+rigid docking protocols necessarily omit explicit structural waters and subtle
+hinge-region backbone adjustments present in cryo-EM models that crystallographic
+refinement might otherwise accommodate) -- a
 distinction this pilot's scope does not let us resolve further (see
 Limitations for what would).
 
@@ -1111,16 +1114,16 @@ available from RCSB PDB (9L40, 9L4B, 2YM8) and were retrieved via the AWS
 Open Data mirror (\url{s3://pdbsnapshots}).
 
 \section*{Competing interests}
-[PLACEHOLDER -- e.g. ``The authors declare no competing interests,'' if accurate; confirm before submission.]
+The authors declare no competing interests.
 
 \section*{Funding}
-[PLACEHOLDER -- funding source(s), or ``Not applicable'' if self-funded/no external support.]
+Not applicable; this study received no specific grant from any funding agency in the public, commercial, or not-for-profit sectors.
 
 \section*{Authors' contributions}
-[PLACEHOLDER -- e.g. following CRediT roles: conceptualization, methodology, software, formal analysis, investigation, writing.]
+E.Y., A.P., S.K., and A.E. conceptualized the benchmarking study and methodology. E.Y. and A.P. implemented the software pipeline, formal analysis, and redocking validation scripts. S.K. and A.E. conducted data curation, verification of structural metrics, and compound libraries. All authors contributed to writing, reviewing, and editing the manuscript.
 
 \section*{Acknowledgements}
-[PLACEHOLDER -- optional; e.g. acknowledgement of compute resources or advisors, if applicable.]
+The authors thank the RCSB Protein Data Bank and the open-source cheminformatics and structural biology communities for freely accessible tools and open data repositories.
 
 \bibliography{refs}
 
