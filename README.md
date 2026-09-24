@@ -1,137 +1,149 @@
-# Candidate ATR/CHK1 Ligand Prioritization for Replication-Stress Research
+# CogRed — Cognate Redocking Validation Pipeline
 
-Open-science computational pipeline supporting the manuscript *"Leakage-
-Controlled Benchmarking and Structure-Based Prioritization of Candidate ATR
-and CHK1 Ligands for Replication-Stress Research."*
+Pipeline code and analysis scripts supporting:
 
-> **Evidentiary boundary — read before using or citing anything here.**
-> This pipeline supports claims about **predicted** binding, relative ranking,
-> retrieval performance under scaffold-split evaluation, conformational
-> stability, estimated relative energetics, predicted selectivity, and
-> predicted developability. It **cannot** establish whether a ligand activates,
-> inhibits, or partially modulates ATR/CHK1, nor any statement about pathway
-> output, fork stability, or cellular or genomic phenotype. ATR activation is
-> protein-mediated (ATRIP/TOPBP1/ETAA1) and is not determined by ATP-pocket
-> occupancy. Outputs are **candidates and hypotheses for experimental
-> testing**, not demonstrated modulators.
+> **Cognate redocking as a quality-control step for cryo-EM kinase receptor structures: a study of ATR/CHK1 and CDK-activating kinase**
+>
+> Ye E, Padarthi A, Kim S, Elie-Dit-Cosaque A, Jo E (2026)
+>
+> *Journal of Computer-Aided Molecular Design* (submitted)
 
-Start here:
+Raw data and results are available in the companion repository:
+[ethanyyy123/research-molecule-editing](https://github.com/ethanyyy123/research-molecule-editing)
 
-- **[`manuscript/submission/paper.pdf`](manuscript/submission/paper.pdf)** —
-  a real, fully executed, submittable pilot paper (LaTeX source in the same
-  folder). This "sandboxed" environment actually has pip access to PyPI
-  (real `vina`, `openmm`, `openbabel-wheel`, `spyrmsd` install from there),
-  read access to the RCSB PDB's AWS Open Data mirror (`s3://pdbsnapshots`,
-  reachable even though `rcsb.org` is not — including its wwPDB validation
-  reports), and apt access (a full LaTeX + PyMOL toolchain installs
-  cleanly) — so this paper's central finding is real, not a placeholder:
-  **a redocking validation control reproducibly passed one 2025 ATR
-  structure (9L4B, 3.20 Å) and failed another (9L40, 2.87 Å — the
-  *higher*-resolution of the two) solved in the same study**, a finding
-  that survives symmetry-corrected RMSD, ruling out the adjacent allosteric
-  site as a confound, and re-validation at the exhaustiveness actually used
-  for screening. A 40-compound BRICS-derived pipeline sanity-check screen
-  was then docked against the validated structure. This n=1 finding was
-  extended (round 4) to a 17-structure survey (14 additional cryo-EM
-  structures of an unrelated kinase, CDK7/cyclin H/MAT1): **13/14 (93%)
-  fail redocking, and wwPDB Q-score/residue inclusion do not predict
-  which ones will** (Q-score actually trends the wrong way) — a negative
-  result for the metric, reported as found. A fifth external review then
-  caught two real errors (an arithmetic mistake in that fail count, and a
-  mischaracterized structure pair) and one confounded experiment
-  (flexible-sidechain docking), and demanded a decisive positive control
-  before the survey's core claim could be trusted: run the identical,
-  unmodified pipeline on an external, unbiased benchmark and compare its
-  pass rate to the literature. **That control was run for real** (20
-  objectively selected CASF-2016 complexes): the pipeline's own pass rate
-  (40%) is statistically indistinguishable from AutoDock Vina's
-  documented 58% self-docking baseline, ruling out a broken pipeline,
-  while the CAK survey's rate remains a significant outlier even against
-  that measured 40% baseline (p=0.008) — the finding survives. Corrected
-  under the same scrutiny: the flexible-docking test's original
-  comparison was confounded (box size and receptor prep changed along
-  with flexibility); a matched control shows flexibility genuinely helps,
-  just not enough to pass. Docking the same pilot library against 9L40
-  instead of the validated 9L4B still produces a substantially different,
-  less trustworthy ranking (5/10 shared top compounds, confirmed under a
-  matched 3-seed design) — a concrete demonstration of what the
-  validation step prevents. Scope is deliberately narrower than the full
-  pipeline below (no MD — no GPU available — no kinome panel, and the
-  17-structure survey is a convenience sample, not a systematic one); see
-  `data/pilot_run_v1/README.md` for the real data behind every number in
-  it, `docs/06_review_response_round3.md` and
-  `docs/07_review_response_round4.md` for what earlier external reviews
-  tried to break, and `docs/08_review_response_round5.md` for the
-  positive-control validation, the two claims withdrawn, and the two
-  confounds found and corrected.
-- **[`manuscript/draft_v1.md`](manuscript/draft_v1.md)** — the earlier,
-  fully-`[PENDING]` draft against the *original*, larger-scope pipeline
-  below, written when PubChem/ChEMBL/UCSC/RCSB and Vina/OpenMM/AmberTools
-  really were unreachable in that session. Superseded as the "submittable"
-  artifact by the real pilot paper above, but still the right reference for
-  the full multi-target pipeline's intended design once more compute/access
-  is available.
-- **[`docs/05_review_response_round2.md`](docs/05_review_response_round2.md)**
-  — response to a second external review, of the manuscript draft itself.
-  Several structural-biology and benchmarking-literature claims in that review
-  were independently verified before acting on them (one — a specific analog
-  count in a cited leakage audit — matched exactly). Real gaps closed as a
-  result: a docking-accuracy validation control, an actual (not just reported)
-  leakage-exclusion filter, a corrected MM-GBSA/MM-PBSA naming inconsistency,
-  and a corrected PKA fold classification.
-- **[`docs/04_review_response.md`](docs/04_review_response.md)** — response to
-  external review (Round 1): what was accepted, what was contested, and every
-  change it forced. **Read this first** — it explains why the project's central
-  claim was lowered and why several scripts were rewritten.
-- **[`docs/02_manuscript_outline.md`](docs/02_manuscript_outline.md)** —
-  current IMRaD outline (Revision 2), restructured so the pipeline must earn
-  trust via benchmarking before its candidates are presented.
-- **[`docs/03_journal_targeting_strategy.md`](docs/03_journal_targeting_strategy.md)**
-  — journal strategy (Revision 2). Scientific Reports is now the primary
-  target; JCIM was demoted for a verified scope reason.
-- **[`docs/01_critique_and_rigor_elevation.md`](docs/01_critique_and_rigor_elevation.md)**
-  — original rigor audit. Sections 2 and 4 are **superseded**; retained for the
-  revision record.
+---
 
-## Pipeline (`scripts/`, run in order)
-
-| # | Script | Methods § | What it does |
-|---|---|---|---|
-| 01 | `01_fragile_site_mapping.py` | SI | CFS genomic features (FRA3B/FRA16D/FRA7H). Supporting Information — defines the terminal experimental prediction, does **not** drive compound selection |
-| 02 | `02_seed_compound_library.py` | 2.2 | Reproducible SMILES retrieval (PubChem/ChEMBL); provenance recorded for the leakage audit |
-| 03 | `03_derivative_generation.py` | 2.3 | BRICS derivative generation + property pre-filters. Standard cheminformatics, **not claimed as novelty** |
-| 04 | `04_developability_prediction.py` | 2.6 | In silico developability/toxicity **prediction** (renamed from "ADMET triage" — nothing here is measured) |
-| 05 | `05_docking_pipeline.py` | 2.4 | Vina batch docking (exhaustiveness 32 default); ≥3 seeded runs per ligand; **redocking validation control** (RMSD ≤2.0 Å pre-specified pass threshold) required before any candidate is scored |
-| 06 | `06_md_simulation_setup.py` | 2.7 | OpenMM MD (OpenFF ligand parametrization) |
-| 07 | `07_mmpbsa_binding_energy.py` | 2.8 | **MM-GBSA** relative energetic estimation (fixed naming — the method run here is GB, not PB; `MMPBSA.py` remains the correct tool name) + trajectory-window sensitivity. Never reported as ΔG |
-| 08 | `08_kinase_selectivity_profiling.py` | 2.9 | **Predicted** cross-kinase selectivity, z-normalized *within each receptor*; PKA correctly framed as a fold comparator (CAMK/AGC), not a distant control; reference-set benchmark now requires ≥20 compounds before being treated as validation |
-| 09 | `09_pipeline_validation.py` | 2.5 | Scaffold-split retrieval with a pre-specified Tanimoto ≥0.4 exclusion that actually removes leaked evaluation compounds (not just reports them); baseline-vs-pipeline comparison with bootstrap CIs; dual decoy-standard comparison |
-| 10 | `10_integrated_ranking.py` | 2.10 | Pre-specified desirability weights **plus** Dirichlet Monte-Carlo weight-sensitivity analysis and objective-correlation reporting |
-
-### Pre-specified analysis plan
-
-Splits, metrics, and desirability weights are fixed in code (`09_*`, `10_*`)
-before results are seen. **If the benchmark shows the multi-stage pipeline does
-not outperform baseline docking, that is the reported result** — see
-`docs/04_review_response.md` §B. Both scripts print an explicit notice when
-their outputs fail to support the more favorable interpretation.
-
-## Setup
+## Installation
 
 ```bash
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-External CLI tools (not pip-installable): Open Babel (`obabel`), AutoDock Vina
-(`vina`), AmberTools (`MMPBSA.py`, script 07 only — post-processing only; the
-MD engine throughout is OpenMM).
+### External dependencies (not pip-installable)
 
-## Open items
+| Tool | Version | Purpose |
+|------|---------|---------|
+| [AutoDock Vina](https://github.com/ccsb-scripps/AutoDock-Vina) | 1.2.7 (Python bindings) | Molecular docking |
+| [Open Babel](https://openbabel.org/) | 3.1.1 | Receptor/ligand preparation, format conversion |
+| [Meeko](https://github.com/forlilab/Meeko) | 2025 | Flexible-receptor PDBQT preparation |
+| [spyrmsd](https://github.com/RMeli/spyrmsd) | 0.6.2 | Symmetry-corrected RMSD |
 
-- **Highest-value next step:** a wet-lab collaborator for a biochemical
-  ATR/CHK1 kinase assay on the top candidates. It is the only thing that
-  restores a functional-pharmacology claim and reopens JCIM/PLOS Comp Biol.
-- Assumptions currently baked into the scripts (seed strategy, OpenMM +
-  MMPBSA.py choice, MD compute scoping) are listed in
-  `docs/01_critique_and_rigor_elevation.md` §6.
+### Receptor structures
+
+Receptor structures are **not** included in this repository (large, regenerable). Retrieve from the RCSB PDB AWS Open Data mirror:
+
+```
+s3://pdbsnapshots (snapshot 2026-01-01)
+```
+
+PDB IDs used: `9L40`, `9L4B`, `2YM8`, and 14 CAK structures (`8P6V`–`8P7L`; see Table 2 in the manuscript).
+
+---
+
+## Pipeline Scripts
+
+The `scripts/` directory contains the full computational pipeline. Scripts are numbered and designed to run in order:
+
+| # | Script | Manuscript § | Description |
+|---|--------|-------------|-------------|
+| 01 | `01_fragile_site_mapping.py` | SI | CFS genomic features (FRA3B/FRA16D/FRA7H) |
+| 02 | `02_seed_compound_library.py` | 2.2 | Seed compound SMILES retrieval from PubChem/ChEMBL |
+| 03 | `03_derivative_generation.py` | 2.3 | BRICS fragmentation + recombination (capped at 5,000 candidates) |
+| 04 | `04_developability_prediction.py` | 2.6 | Lipinski/Veber/Ghose/Egan drug-likeness + PAINS/Brenk filtering |
+| 05 | `05_docking_pipeline.py` | 2.4 | Vina batch docking (exhaustiveness 32); 3 seeded replicates; redocking validation required before scoring |
+| 06 | `06_md_simulation_setup.py` | 2.7 | OpenMM MD setup (OpenFF ligand parametrization) |
+| 07 | `07_mmpbsa_binding_energy.py` | 2.8 | MM-GBSA relative binding energy estimation |
+| 08 | `08_kinase_selectivity_profiling.py` | 2.9 | Cross-kinase selectivity profiling |
+| 09 | `09_pipeline_validation.py` | 2.5 | Scaffold-split retrieval benchmark with leakage exclusion |
+| 10 | `10_integrated_ranking.py` | 2.10 | Multi-objective ranking with Dirichlet weight-sensitivity analysis |
+
+> **Note:** Scripts 06–10 require additional compute resources (GPU for MD, AmberTools for MM-GBSA) and were not executed in the pilot study described in the manuscript. They represent the full-scope pipeline design.
+
+---
+
+## Data Directory
+
+The `data/pilot_run_v1/` directory contains all executed analyses. Each subdirectory includes the Python script that generated its results:
+
+```
+data/pilot_run_v1/
+├── seed_compounds.csv              # 5 seed compounds (3 co-crystallized + 2 known inhibitors)
+├── derivative_library.csv          # 786 BRICS derivatives passing pre-filters
+├── developability_predictions.csv  # Drug-likeness scores for all 791 compounds
+├── docking_candidate_set.csv       # 40-compound pilot set selected for docking
+├── redocking_validation_results.json  # Pass/fail for 9L40, 9L4B, 2YM8
+├── atr_docking_results_raw.csv     # 40 compounds × 3 seeds vs. validated 9L4B
+├── atr_docking_results_summary.csv # Mean ± SD Vina scores
+├── box_centers.json                # Docking box centers (ligand centroids)
+│
+├── ligands/                        # Extracted co-crystallized ligands (.sdf)
+├── validation_analysis/            # Symmetry-corrected RMSD, wwPDB reports, redocked poses
+├── cak_survey/                     # 14-structure CDK7/cyclin H/MAT1 survey (Table 2)
+├── flexible_redocking/             # Flexible-sidechain redocking test (§3.4)
+├── rank_concordance/               # 9L40 vs. 9L4B rank comparison (§3.5)
+└── casf_2016_control/              # 20-complex CASF-2016 positive control (§3.3)
+```
+
+---
+
+## Reproducing Key Results
+
+### 1. Redocking validation (Table 1)
+```bash
+cd data/pilot_run_v1
+python run_redocking_validation.py    # Initial validation
+python run_redocking_replicates.py    # 3-seed replicates
+cd validation_analysis
+python compute_symmrmsd.py            # Symmetry-corrected RMSD
+```
+
+### 2. CAK multi-structure survey (Table 2)
+```bash
+cd data/pilot_run_v1/cak_survey
+python run_batch.py                   # All 14 CAK structures
+```
+
+### 3. CASF-2016 positive control (Table 3)
+```bash
+cd data/pilot_run_v1/casf_2016_control
+python run_casf_batch.py              # 20 CASF-2016 complexes
+```
+
+### 4. Flexible-sidechain analysis (§3.4)
+```bash
+cd data/pilot_run_v1/flexible_redocking
+python run_flexible_redocking_one_seed.py   # 3 seeds, 5 flexible residues
+cd ../casf_2016_control
+python run_rigid_control_matched.py         # Matched rigid control (30 Å box)
+```
+
+### 5. Rank concordance / error propagation (§3.5)
+```bash
+cd data/pilot_run_v1/rank_concordance
+python run_library_docking_9l40_3seed.py    # 40 compounds vs. excluded 9L40
+```
+
+---
+
+## Key Results
+
+| Analysis | Result | Manuscript |
+|----------|--------|-----------|
+| 9L40 redocking (2.87 Å resolution) | **Fail** — RMSD 2.53 ± 0.01 Å | Table 1 |
+| 9L4B redocking (3.20 Å resolution) | **Pass** — RMSD 0.61 ± 0.02 Å | Table 1 |
+| 2YM8 redocking (2.07 Å, X-ray) | **Pass** — RMSD 0.76 ± 0.01 Å | Table 1 |
+| CAK survey (14 cryo-EM structures) | 13/14 fail (7.1% pass rate) | Table 2 |
+| CASF-2016 control (20 complexes) | 8/20 pass (40%; 95% CI 19–64%) | Table 3 |
+| Flexible redocking of 9L40 | 3.00 ± 0.92 Å (improved vs. matched rigid control 4.50 Å, still fails) | §3.4 |
+| Rank concordance 9L40 vs. 9L4B | Spearman ρ = 0.21; 5/10 shared top-10 | §3.5, Table 4 |
+
+---
+
+## Citation
+
+If you use this pipeline or data, please cite the manuscript (reference to be updated upon publication).
+
+## License
+
+This project is provided for academic and research use. See the manuscript for full methodological details.
